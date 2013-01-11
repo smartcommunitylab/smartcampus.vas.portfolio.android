@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright 2012-2013 Trento RISE
+  
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+         http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either   express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<resources>
+
+    <!-- Test configurations -->
+    <string name="test_mode_enabled">false</string>
+    <string name="test_username">test</string>
+    <string name="test_email_as_username">test@test.com</string>
+    <string name="test_password">test</string>
+
+    <!-- Configurations -->
+    <string name="use_email_as_username">true</string> <!-- For test: LoginFragment automatically manage updates -->
+    <string name="remember_login_credentials_enabled">true</string>
+    <string name="default_tag_character">#</string>
+    <string name="default_semantic_tag_character">(</string>
+    <string name="default_tag_separator">,</string>
+    
+    <!-- Labels of portfolio's categories labels -->
+    <string-array name="portfolio_categories_labels">
+        <item>@string/personal_info</item>
+        <item>@string/cherry_on_the_cake</item>
+        <item>@string/presentation</item>
+        <item>@string/overview</item>
+        <item>@string/study</item>
+        <item>@string/work</item>
+        <item>@string/comments</item>
+        <item>@string/recommendations</item>
+        <item>@string/more_about_me</item>
+    </string-array>
+    
+    <string name="categories_separator">,</string>
+    
+    <!-- Categories associated to label -->
+    <string-array name="portfolio_categories_ordered">
+        <item>language, skill, contact</item>			<!-- Personal Info -->
+        <item>@null</item>								<!-- Cherry on the cake -->
+        <item>presentation</item>						<!-- Presentation -->
+        <item>@null <!-- overview --></item>							<!-- Overview -->
+        <item>education</item>							<!-- Study -->
+        <item>professional</item>						<!-- Work -->
+        <item>@null</item> 								<!-- Comments -->
+        <item>@null</item> 								<!-- Recommendations -->
+        <item>about</item> 								<!-- More about me -->
+    </string-array>
+        
+    <!-- Categories forced to be shown -->
+    <string-array name="portfolio_categories_shown">
+        <item>true</item> 								<!-- Personal Info -->
+        <item>false</item> 								<!-- Cherry on the cake -->
+        <item>false</item> 								<!-- Presentation -->
+        <item>false</item> 								<!-- Overview -->
+        <item>false</item> 								<!-- Study -->
+        <item>false</item> 								<!-- Work -->
+        <item>false</item> 								<!-- Comments -->
+        <item>false</item> 								<!-- Recommendations -->
+        <item>false</item> 								<!-- More about me -->
+    </string-array>
+    
+    <!-- Allowed fields for PersonalInfo -->
+    <string-array name="allowed_personal_info_student">
+        <item>name</item>
+        <item>surname</item>
+        <item>nation</item>
+        <item>cfu_cfuTotal</item>
+        <item>marksAverage</item>
+        <item>gender</item>
+        <item>dateOfBirth</item>
+        <item>phone</item>
+        <item>mobile</item>
+        <item>address</item>
+        <item>cds</item>
+        <item>enrollmentYear</item>
+        <item>academicYear</item>
+        <item>marksNumber</item>
+        </string-array>
+
+</resources>

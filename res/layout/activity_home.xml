@@ -1,0 +1,88 @@
+<!--
+  Copyright 2012-2013 Trento RISE
+  
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+         http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either   express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <!-- Container for all fragments in the activity -->
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- View for user notes -->
+
+    <SlidingDrawer
+        android:id="@+id/slidingDrawer1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:content="@+id/content"
+        android:handle="@+id/handle"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/handle"
+            android:layout_width="23dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_opennotes"
+            android:clickable="true" />
+
+        <LinearLayout
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/noticeboard_background"
+            >
+
+            <EditText
+                android:id="@+id/note_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:clickable="true"
+                android:gravity="top|left"
+                android:hint="@string/add_notes"
+                android:inputType="textCapSentences|textMultiLine"
+                android:padding="15dp" />
+        </LinearLayout>
+    </SlidingDrawer>
+
+    <!-- eu.trentorise.smartcampus.portfolio.widget.NoteView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="left" >
+
+        <LinearLayout
+            android:id="@+id/stripe"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:background="@color/noticeboard_background"
+            android:clickable="true" >
+
+            <Button
+                android:id="@+id/stripe_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_opennotes"
+                android:clickable="true" />
+        </LinearLayout>
+    </eu.trentorise.smartcampus.portfolio.widget.NoteView -->
+
+    <!-- Container for all fragments in the activity -->
+
+</FrameLayout>

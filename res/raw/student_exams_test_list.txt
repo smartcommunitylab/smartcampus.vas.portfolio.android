@@ -1,0 +1,129 @@
+#-------------------------------------------------------------------------------
+# Copyright 2012-2013 Trento RISE
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#        http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either   express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#-------------------------------------------------------------------------------
+{
+    "userId": "2345",
+    "unitnId": "1111",
+    "examData": [
+        {
+            "id": "1",
+            "cod": "I09CAD01",
+            "name": "Reti di calcolatori",
+            "result": "24",
+            "lode": false,
+            "weight": "6",
+            "date": 1339390800
+        },
+        {
+            "id": "2",
+            "cod": "I09CAD02",
+            "name": "Software Engineering",
+            "result": "30",
+            "lode": true,
+            "weight": "12",
+            "date": 1339736400
+        },
+        {
+            "id": "3",
+            "cod": "I09CAD03",
+            "name": "Functional Programming",
+            "result": "25",
+            "lode": false,
+            "weight": "6",
+            "date": 1341982800
+        },
+        {
+            "id": "4",
+            "cod": "I09CAD04",
+            "name": "Fisica",
+            "result": "24",
+            "lode": false,
+            "weight": "6",
+            "date": 1307250000
+        },
+        {
+            "id": "5",
+            "cod": "I09CAD05",
+            "name": "Operating Systems",
+            "result": "30",
+            "lode": true,
+            "weight": "6",
+            "date": 1308546000
+        },
+        {
+            "id": "6",
+            "cod": "I09CAD06",
+            "name": "Computer Architecture",
+            "result": "28",
+            "lode": false,
+            "weight": "6",
+            "date": 1320645600
+        },
+        {
+            "id": "7",
+            "cod": "I09CAD07",
+            "name": "Database",
+            "result": "24",
+            "lode": false,
+            "weight": "6",
+            "date": 1304917200
+        },
+        {
+            "id": "8",
+            "cod": "I09CAD08",
+            "name": "Web programming",
+            "result": "30",
+            "lode": true,
+            "weight": "12",
+            "date": 1295071200
+        },
+        {
+            "id": "9",
+            "cod": "I09CAD09",
+            "name": "Alghorithm and data structures",
+            "result": "24",
+            "lode": false,
+            "weight": "12",
+            "date": 1294898400
+        },
+        {
+            "id": "10",
+            "cod": "I09CAD10",
+            "name": "Formal language and compilators",
+            "result": "25",
+            "lode": false,
+            "weight": "12",
+            "date": 1325397600
+        },
+        {
+            "id": "11",
+            "cod": "I09CAD11",
+            "name": "Semantics",
+            "result": "20",
+            "lode": false,
+            "weight": "12",
+            "date": 1328940000
+        },
+        {
+            "id": "12",
+            "cod": "I09CAD12",
+            "name": "Statistics",
+            "result": "18",
+            "lode": false,
+            "weight": "12",
+            "date": 1346648400
+        }
+    ]
+}

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright 2012-2013 Trento RISE
+  
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+         http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either   express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<resources>
+    
+    <!-- Base Colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="dark_gray">#3D3D3D</color>
+    <color name="gray">#666666</color>
+    <color name="cherry">#A8120E</color>
+    <color name="light_gray">#CCCCCC</color>
+    <color name="holo_blue_light">#ff77d8f8</color>
+    <color name="holo_blue_dark">#ff0099cc</color>
+    
+    <!-- Items Colors -->
+    <color name="actionbar_background">#D9532F</color>
+    <color name="noticeboard_background">#FFD700</color>
+    <color name="item_hidden_view_background">@color/dark_gray</color>   
+    <color name="item_switcher_view_background">#969696</color>
+    <color name="item_label_background">#3D3D3D</color>
+    <color name="item_label_textcolor">@color/white</color>
+    <color name="item_background_unselected">#969696</color>
+    <color name="separator_background">@color/light_gray</color>
+    <color name="separator_label_background">@color/dark_gray</color>
+    <color name="not_found">@color/light_gray</color>
+    
+</resources>

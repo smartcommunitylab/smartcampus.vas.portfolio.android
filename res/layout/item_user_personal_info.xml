@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright 2012-2013 Trento RISE
+  
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+         http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either   express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/separator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/separator_label_background"
+        android:paddingBottom="4dp"
+        android:paddingLeft="6dp"
+        android:paddingRight="6dp"
+        android:paddingTop="4dp"
+        android:text="@string/app_name"
+        android:textColor="@color/white" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:minHeight="@dimen/item_portfolio_height" >
+
+        <!-- Button container -->
+
+        <LinearLayout
+            android:id="@+id/button_container"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/item_portfolio_height"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="4dp"
+            android:gravity="center_vertical" >
+
+            <!-- ImageButton for the icon of eye -->
+
+            <eu.trentorise.smartcampus.portfolio.widget.AdapterImageButton
+                android:id="@+id/eye_button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_eye_selected" />
+
+            <!-- ImageButton for the icon of cherry -->
+
+            <eu.trentorise.smartcampus.portfolio.widget.AdapterImageButton
+                android:id="@+id/cherry_button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_cherry_selected" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/text_container"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/item_portfolio_height"
+            android:layout_toLeftOf="@+id/button_container"
+            android:gravity="center_vertical"
+            android:orientation="vertical" >
+
+            <!-- TextView that contains the object of title element -->
+
+            <TextView
+                android:id="@+id/title_element"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginTop="3dp"
+                android:lines="1"
+                android:scrollHorizontally="true"
+                android:singleLine="true"
+                android:text="@string/app_name"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/user_produced_data_list_item" />
+
+            <!-- TextView that contains the object of subtitle element -->
+
+            <TextView
+                android:id="@+id/subtitle_element"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginTop="3dp"
+                android:lines="1"
+                android:scrollHorizontally="true"
+                android:singleLine="true"
+                android:text="@string/app_name"
+                android:textSize="@dimen/user_produced_data_list_item" />
+        </LinearLayout>
+    </RelativeLayout>
+
+</LinearLayout>
