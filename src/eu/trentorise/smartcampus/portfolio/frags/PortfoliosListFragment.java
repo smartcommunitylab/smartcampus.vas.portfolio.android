@@ -419,7 +419,7 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 				public void onClick(View v) {
 					ShareEntityObject obj = new ShareEntityObject(p.entityId,
 							p.name, ENTITY_TYPE_PORTFOLIO);
-					SharingHelper.follow(getActivity(), obj);
+					SharingHelper.share(getActivity(), obj);
 				}
 			});
 			holder.tagButton.setOnClickListener(new OnClickListener() {
