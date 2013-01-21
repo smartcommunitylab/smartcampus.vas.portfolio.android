@@ -18,8 +18,8 @@
     android:installLocation="internalOnly"
     android:sharedUserId="eu.trentorise.smartcampus.shared"
     android:sharedUserLabel="@string/app_uid_label"
-    android:versionCode="14"
-    android:versionName="0.11.15" >
+    android:versionCode="15"
+    android:versionName="0.11.16" >
 
     <uses-sdk
         android:minSdkVersion="8"
