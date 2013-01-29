@@ -4,14 +4,14 @@
 
     <string name="app_name">MyCVs</string>
     <string name="menu_settings">Settings</string>
-    <string name="title_activity_home">Portfolio</string>
+    <string name="title_activity_home">My CVs</string>
     <string name="app_uid_label">SmartCampus</string>
     <string name="date_format">dd/MM/yy</string>
 
     <!-- Labels -->
 
-    <string name="my_portfolios">My portfolios</string>
-    <string name="portfolio">Portfolio</string>
+    <string name="my_portfolios">My CVs</string>
+    <string name="portfolio">My CV</string>
     <string name="projects">Projects</string>
     <string name="noticeboard">Notice board</string>
     <string name="title">Title</string>
