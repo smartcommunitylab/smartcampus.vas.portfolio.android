@@ -2,7 +2,7 @@
 
     <!-- App lables -->
 
-    <string name="app_name">Portfolio</string>
+    <string name="app_name">MyCVs</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_home">Portfolio</string>
     <string name="app_uid_label">SmartCampus</string>
