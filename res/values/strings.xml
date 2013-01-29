@@ -26,11 +26,11 @@
     <string name="date">Date</string>
     <string name="object">Object</string>
     <string name="description">Description</string>
-    <string name="new_portfolio">New Portfolio</string>
+    <string name="new_portfolio">New CV</string>
     <string name="role_in_prj">Role in the project</string>
     <string name="create">Create</string>
-    <string name="tag_portfolio">Tag Portfolio</string>
-    <string name="edit_portfolio">Edit Portfolio</string>
+    <string name="tag_portfolio">Tag CV</string>
+    <string name="edit_portfolio">Edit CV</string>
     <string name="cancel">Cancel</string>
     <string name="identity_info">Identity information</string>
     <string name="languages">Languages</string>
@@ -75,7 +75,7 @@
     <string name="pay_attention">Pay attention please.</string>
     <string name="be_careful">Be careful!</string>
     <string name="sure_to_continue_without_save">Are you sure that you want to continue without saving your progress?</string>
-    <string name="sure_to_show_these_data">Having enabled this entry, if you share this portfolio, your university marks will be visible to other users.</string>
+    <string name="sure_to_show_these_data">Having enabled this entry, if you share this CV, your university marks will be visible to other users.</string>
     <string name="add_notes">Add here some notes&#8230;</string>
     <string name="no_connection_available">No connection available.</string>
     <string name="not_valid_name">Not valid name.</string>
@@ -93,21 +93,21 @@
     <string name="tags_successfully_added">Tags successfully added.</string>
     <string name="tags_not_added">An error occurs. Please try later.</string>
     <string name="not_found_news">No news found.</string>
-    <string name="not_found_portfolios">No portfolios found.</string>
+    <string name="not_found_portfolios">No CVs found.</string>
     <string name="not_found_data">No data found.</string>
     <string name="tip_add_tags">Type your tags separated by commas.</string>
     <string name="an_error_has_occured">An Error has occured. Sorry.</string>
-    <string name="cannot_find_portfolio">We are sorry to inform you that the selected portfolio cannot be opened.</string>
-    <string name="portfolio_already_exist">This portfolio\'s name already exists</string>
-    <string name="sure_delete_portfolio">Are you sure you want to delete the portfolio?</string>
+    <string name="cannot_find_portfolio">We are sorry to inform you that the selected CV cannot be opened.</string>
+    <string name="portfolio_already_exist">This CV\'s name already exists</string>
+    <string name="sure_delete_portfolio">Are you sure you want to delete the CV?</string>
     <!-- Portfolios -->
     <string name="edit">Edit</string>
     <string name="app_failure_security">Failed to retrieve authentication data</string>
     <string name="app_failure_setup">Failed to initialize application</string>
     <string name="app_failure_operation">OOPS! An error occurred. Please check your connection or try again later</string>
-    <string name="welcome_msg">Hello! Welcome to the Portfolio for Android. This app will allow you to check your portfolios and take some notes about them.</string>
-    <string name="welcome_msg2">You will automagically find your notes on the Portfolio web application (https://vas.smartcampuslab.it/portfolio), from which you will be able to edit and customize your portfolios.</string>
+    <string name="welcome_msg">Hello! Welcome to the MyCVs for Android. This app will allow you to check your CVs and take some notes about them.</string>
+    <string name="welcome_msg2">You will automagically find your notes on the MyCVs web application (https://vas.smartcampuslab.it/portfolio), from which you will be able to edit and customize your CVs.</string>
     <string name="welcome_msg_showagain">Don\'t show this again</string>
-    <string name="notes_hint">Add here any notes about your portfolios: you will find them again on the Portfolio web page.</string>
+    <string name="notes_hint">Add here any notes about your CVs: you will find them again on the MyCVs web page.</string>
 
 </resources>
