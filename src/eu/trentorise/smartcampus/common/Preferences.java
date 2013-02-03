@@ -35,7 +35,7 @@ public final class Preferences {
 	private static final String APP_TOKEN = "portfolio_android";
 	
 	// Service
-	private static final String SERVICE = "/portfolio/rest/";
+	private static final String SERVICE = "/mycvs/rest/";
 	
 	// Shared package path
 	private static final String SHARED_PACKAGE = "eu.trentorise.smartcampus.launcher";
