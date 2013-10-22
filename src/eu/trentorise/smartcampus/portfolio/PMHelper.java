@@ -25,9 +25,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.widget.Toast;
+import eu.trentorise.smartcampus.ac.AACException;
 import eu.trentorise.smartcampus.ac.SCAccessProvider;
-import eu.trentorise.smartcampus.ac.authenticator.AMSCAccessProvider;
 import eu.trentorise.smartcampus.android.common.Utils;
 import eu.trentorise.smartcampus.android.common.tagging.SemanticSuggestion;
 import eu.trentorise.smartcampus.android.common.tagging.SuggestionHelper;
@@ -59,7 +60,9 @@ public class PMHelper {
 	private static Context mContext;
 	private static PMHelper instance = null;
 	private static RemoteStorage remoteStorage = null;
-	private static SCAccessProvider accessProvider = new AMSCAccessProvider();
+	private static SCAccessProvider accessProvider = null;
+
+	public static String mToken;
 
 	// cached notes
 	private UserData userData = null;
@@ -76,16 +79,20 @@ public class PMHelper {
 
 	protected PMHelper(Context mContext) {
 		super();
+		this.mContext = mContext;
+		this.accessProvider = SCAccessProvider.getInstance(mContext);
 	}
 
-	public static void init(Context mContext) {
-		PMHelper.mContext = mContext;
-		config = new AppConfigurations(mContext);
-		instance = new PMHelper(mContext);
+	public static void init(Context ctx) {
+		config = new AppConfigurations(ctx);
+		mContext = ctx;
+		if (instance == null) {
+			instance = new PMHelper(mContext);
+		}
 	}
 
 	public static void start() throws NameNotFoundException, DataException, ConnectionException, ProtocolException,
-			SecurityException {
+			SecurityException, AACException {
 		getPortfolioList();
 	}
 
@@ -96,7 +103,7 @@ public class PMHelper {
 		return instance;
 	}
 
-	public static RemoteStorage getRemoteStorage() throws NameNotFoundException, ProtocolException {
+	public static RemoteStorage getRemoteStorage() throws NameNotFoundException, ProtocolException, AACException {
 		if (remoteStorage == null) {
 			remoteStorage = new RemoteStorage(mContext, Preferences.getAppToken());
 		}
@@ -108,11 +115,14 @@ public class PMHelper {
 		return mContext;
 	}
 
-	public static String getAuthToken() {
-		return getAccessProvider().readToken(mContext, null);
+	public static String getAuthToken() throws AACException {
+		return mToken;
 	}
 
 	public static SCAccessProvider getAccessProvider() {
+		if (accessProvider == null) {
+			accessProvider = SCAccessProvider.getInstance(mContext);
+		}
 		return accessProvider;
 	}
 
@@ -126,7 +136,7 @@ public class PMHelper {
 	}
 
 	public static void setNotes(String string) throws DataException, NameNotFoundException, ConnectionException,
-			ProtocolException, SecurityException {
+			ProtocolException, SecurityException, AACException {
 		if (getInstance().userData == null) {
 			getNotes();
 		}
@@ -135,8 +145,8 @@ public class PMHelper {
 
 	}
 
-	public static String getNotes() throws DataException, NameNotFoundException, ConnectionException,
-			ProtocolException, SecurityException {
+	public static String getNotes() throws DataException, NameNotFoundException, ConnectionException, ProtocolException,
+			SecurityException, AACException {
 		// if (getInstance().userData == null) {
 		Collection<UserData> list = getRemoteStorage().getObjects(UserData.class);
 		if (list != null && !list.isEmpty()) {
@@ -146,8 +156,8 @@ public class PMHelper {
 		return getInstance().userData.getNotes();
 	}
 
-	public static void createEmptyPortfolio(String name) throws NameNotFoundException, DataException,
-			ConnectionException, ProtocolException, SecurityException {
+	public static void createEmptyPortfolio(String name) throws NameNotFoundException, DataException, ConnectionException,
+			ProtocolException, SecurityException, AACException {
 		Portfolio p = new Portfolio();
 		p.timestamp = System.currentTimeMillis();
 		p.name = name;
@@ -166,7 +176,7 @@ public class PMHelper {
 	}
 
 	public static List<UserProducedData> getUserProducedDataList() throws NameNotFoundException, DataException,
-			ConnectionException, ProtocolException, SecurityException {
+			ConnectionException, ProtocolException, SecurityException, AACException {
 		if (getInstance().userProducedData == null) {
 			if (config.isTestModeEnabled()) {
 				String rawUPData = RawUtil.getRawAsString(mContext, R.raw.user_produced_data_test_list);
@@ -183,19 +193,20 @@ public class PMHelper {
 
 	public static void saveUserProducedData(Portfolio mPortfolio, HashSet<String> mUpdatedElements,
 			HashSet<String> mCherryElements) throws NameNotFoundException, DataException, ConnectionException,
-			ProtocolException, SecurityException {
+			ProtocolException, SecurityException, AACException {
 		mPortfolio.showUserGeneratedData = PMUtils.updateList(mPortfolio.showUserGeneratedData, mUpdatedElements);
 		getRemoteStorage().update(mPortfolio, false);
 	}
 
 	public static void savePresentationData(Portfolio mPortfolio, HashSet<String> mUpdatedElements)
-			throws NameNotFoundException, DataException, ConnectionException, ProtocolException, SecurityException {
+			throws NameNotFoundException, DataException, ConnectionException, ProtocolException, SecurityException,
+			AACException {
 		mPortfolio.showUserGeneratedData = PMUtils.updateList(mPortfolio.showUserGeneratedData, mUpdatedElements);
 		getRemoteStorage().update(mPortfolio, false);
 	}
 
-	public static void savePortfolioData(Portfolio mPortfolio, HashSet<String> mUpdatedElements)
-			throws NameNotFoundException, DataException, ConnectionException, ProtocolException, SecurityException {
+	public static void savePortfolioData(Portfolio mPortfolio, HashSet<String> mUpdatedElements) throws NameNotFoundException,
+			DataException, ConnectionException, ProtocolException, SecurityException, AACException {
 		// mUpdatedElements contains categories
 		HashSet<String> idsHashSet = new HashSet<String>();
 		for (String category : mUpdatedElements) {
@@ -211,33 +222,32 @@ public class PMHelper {
 
 	public static void savePersonalInfo(Portfolio mPortfolio, HashSet<String> mUpdatedInfoElems,
 			HashSet<String> mUpdatedUPDataElements, HashSet<String> mCherryElements) throws NameNotFoundException,
-			DataException, ConnectionException, ProtocolException, SecurityException {
+			DataException, ConnectionException, ProtocolException, SecurityException, AACException {
 		// InfoElems
 		mPortfolio.showStudentInfo = PMUtils.updateList(mPortfolio.showStudentInfo, mUpdatedInfoElems);
 		// UPDataElements
 		mPortfolio.showUserGeneratedData = PMUtils.updateList(mPortfolio.showUserGeneratedData, mUpdatedUPDataElements);
 		// CherryElements
-		mPortfolio.highlightUserGeneratedData = PMUtils.updateList(mPortfolio.highlightUserGeneratedData,
-				mCherryElements);
+		mPortfolio.highlightUserGeneratedData = PMUtils.updateList(mPortfolio.highlightUserGeneratedData, mCherryElements);
 
 		getRemoteStorage().update(mPortfolio, false);
 	}
 
 	public static void savePortfolioCherryData(Portfolio mPortfolio, HashSet<String> mCherryElements)
-			throws NameNotFoundException, DataException, ConnectionException, ProtocolException, SecurityException {
-		mPortfolio.highlightUserGeneratedData = PMUtils.updateList(mPortfolio.highlightUserGeneratedData,
-				mCherryElements);
+			throws NameNotFoundException, DataException, ConnectionException, ProtocolException, SecurityException,
+			AACException {
+		mPortfolio.highlightUserGeneratedData = PMUtils.updateList(mPortfolio.highlightUserGeneratedData, mCherryElements);
 		getRemoteStorage().update(mPortfolio, false);
 	}
 
 	public static void saveTags(Portfolio mPortfolio, List<Concept> list) throws NameNotFoundException, DataException,
-			ConnectionException, ProtocolException, SecurityException {
+			ConnectionException, ProtocolException, SecurityException, AACException {
 		mPortfolio.tags = list;
 		getRemoteStorage().update(mPortfolio, false);
 	}
 
 	public static StudentExams getStudentExams(FragmentActivity activity) throws DataException, NameNotFoundException,
-			ConnectionException, ProtocolException, SecurityException {
+			ConnectionException, ProtocolException, SecurityException, AACException {
 		if (getInstance().hasStudentExams == null) {
 			if (config.isTestModeEnabled()) {
 				String rawData = RawUtil.getRawAsString(mContext, R.raw.student_exams_test_list);
@@ -256,7 +266,7 @@ public class PMHelper {
 	}
 
 	public static List<Portfolio> getPortfolioList() throws DataException, NameNotFoundException, ConnectionException,
-			ProtocolException, SecurityException {
+			ProtocolException, SecurityException, AACException {
 		if (getInstance().portfolioList == null) {
 			if (config.isTestModeEnabled()) {
 				String rawPortfolios = RawUtil.getRawAsString(mContext, R.raw.portfolios_test_list);
@@ -272,7 +282,7 @@ public class PMHelper {
 	}
 
 	public static void removePortfolio(Portfolio p) throws NameNotFoundException, DataException, ConnectionException,
-			ProtocolException, SecurityException {
+			ProtocolException, SecurityException, AACException {
 		if (!config.isTestModeEnabled()) {
 			getRemoteStorage().delete(p.getId(), Portfolio.class);
 		}
@@ -286,7 +296,7 @@ public class PMHelper {
 	}
 
 	public static Portfolio getPortfolio(Long portfolioEntityId) throws NameNotFoundException, DataException,
-			ConnectionException, ProtocolException, SecurityException {
+			ConnectionException, ProtocolException, SecurityException, AACException {
 		if (portfolioEntityId == null)
 			return null;
 		List<Portfolio> list = getPortfolioList();
@@ -298,7 +308,7 @@ public class PMHelper {
 	}
 
 	public static Portfolio findPortfolio(Long portfolioEntityId) throws NameNotFoundException, DataException,
-			ConnectionException, ProtocolException, SecurityException {
+			ConnectionException, ProtocolException, SecurityException, AACException {
 		Portfolio p = getPortfolio(portfolioEntityId);
 		if (p == null) {
 			MessageRequest request = new MessageRequest(Preferences.getHost(mContext), Preferences.getService()
@@ -314,7 +324,7 @@ public class PMHelper {
 	}
 
 	public static Boolean isOwnPortfolio(Long portfolioEntityId) throws NameNotFoundException, DataException,
-			ConnectionException, ProtocolException, SecurityException {
+			ConnectionException, ProtocolException, SecurityException, AACException {
 		if (portfolioEntityId == null)
 			return false;
 		List<Portfolio> list = getPortfolioList();
@@ -326,7 +336,7 @@ public class PMHelper {
 	}
 
 	public static StudentInfo getStudentInfo() throws DataException, NameNotFoundException, ConnectionException,
-			ProtocolException, SecurityException {
+			ProtocolException, SecurityException, AACException {
 		if (getInstance().hasStudentInfo == null) {
 			if (config.isTestModeEnabled()) {
 				String rawData = RawUtil.getRawAsString(mContext, R.raw.student_info_test);
@@ -353,8 +363,8 @@ public class PMHelper {
 		}
 	}
 
-	public static byte[] exportPortfolio(String portfolioId) throws ConnectionException, ProtocolException,
-			SecurityException {
+	public static byte[] exportPortfolio(String portfolioId) throws ConnectionException, ProtocolException, SecurityException,
+			AACException {
 		MessageRequest request = new MessageRequest(Preferences.getHost(mContext), Preferences.getService() + "/generatecv/"
 				+ portfolioId + "/pdf/false");
 		request.setMethod(Method.GET);
@@ -365,8 +375,8 @@ public class PMHelper {
 
 	}
 
-	public static StudentInfo getSharedStudentInfo(String id) throws ConnectionException, ProtocolException,
-			SecurityException {
+	public static StudentInfo getSharedStudentInfo(String id) throws ConnectionException, ProtocolException, SecurityException,
+			AACException {
 		MessageRequest request = new MessageRequest(Preferences.getHost(mContext), Preferences.getService()
 				+ "/eu.trentorise.smartcampus.portfolio.models.StudentInfo/portfolio/" + id);
 		request.setMethod(Method.GET);
@@ -376,8 +386,8 @@ public class PMHelper {
 		return Utils.convertJSONToObject(response.getBody(), StudentInfo.class);
 	}
 
-	public static ArrayList<StudentExams> getSharedStudentExams(String id) throws ConnectionException,
-			ProtocolException, SecurityException {
+	public static ArrayList<StudentExams> getSharedStudentExams(String id) throws ConnectionException, ProtocolException,
+			SecurityException, AACException {
 		MessageRequest request = new MessageRequest(Preferences.getHost(mContext), Preferences.getService()
 				+ "/eu.trentorise.smartcampus.portfolio.models.StudentExams/portfolio/" + id);
 		request.setMethod(Method.GET);
@@ -391,7 +401,7 @@ public class PMHelper {
 	}
 
 	public static ArrayList<UserProducedData> getSharedUserProducedDatas(String id) throws ConnectionException,
-			ProtocolException, SecurityException {
+			ProtocolException, SecurityException, AACException {
 		MessageRequest request = new MessageRequest(Preferences.getHost(mContext), Preferences.getService()
 				+ "/eu.trentorise.smartcampus.portfolio.models.UserProducedData/portfolio/" + id);
 		request.setMethod(Method.GET);
@@ -404,8 +414,8 @@ public class PMHelper {
 		return new ArrayList<UserProducedData>();
 	}
 
-	public static SharedPortfolioContainer getSharedPortfolioContainer(Long id) throws ConnectionException,
-			ProtocolException, SecurityException {
+	public static SharedPortfolioContainer getSharedPortfolioContainer(Long id) throws ConnectionException, ProtocolException,
+			SecurityException, AACException {
 		MessageRequest request = new MessageRequest(Preferences.getHost(mContext), Preferences.getService()
 				+ "/eu.trentorise.smartcampus.portfolio.models.SharedPortfolioContainer/" + id);
 		request.setMethod(Method.GET);

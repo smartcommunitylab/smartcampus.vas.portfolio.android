@@ -110,4 +110,6 @@
     <string name="welcome_msg_showagain">Don\'t show this again</string>
     <string name="notes_hint">Add here any notes about your CVs: you will find them again on the MyCVs web page.</string>
 
+    <string name="token_required">Please login before proceeding with the application.</string>
+    
 </resources>

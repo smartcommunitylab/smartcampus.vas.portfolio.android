@@ -23,10 +23,10 @@ import eu.trentorise.smartcampus.android.common.SCAsyncTask.SCAsyncTaskProcessor
 import eu.trentorise.smartcampus.portfolio.PMHelper;
 import eu.trentorise.smartcampus.portfolio.R;
 
-public abstract class AbstractAsyncTaskProcessor<Params, Result> implements SCAsyncTaskProcessor<Params, Result>{
+public abstract class AbstractAsyncTaskProcessor<Params, Result> implements SCAsyncTaskProcessor<Params, Result> {
 
 	private Activity activity;
-	
+
 	public AbstractAsyncTaskProcessor(Activity activity) {
 		super();
 		this.activity = activity;
@@ -34,24 +34,24 @@ public abstract class AbstractAsyncTaskProcessor<Params, Result> implements SCAs
 
 	@Override
 	public void handleFailure(Exception e) {
-		Log.e(activity.getClass().getName(),""+ e.getMessage());
+		Log.e(activity.getClass().getName(), "" + e.getMessage());
 		PMHelper.showFailure(activity, R.string.app_failure_operation);
 	}
 
 	@Override
 	public void handleConnectionError() {
 		HandleExceptionHelper.showDialogConnectivity(activity);
-		
+
 	}
 
 	@Override
 	public void handleSecurityError() {
-		SCAccessProvider accessProvider =  PMHelper.getAccessProvider();
+		SCAccessProvider accessProvider = PMHelper.getAccessProvider();
 		try {
-			accessProvider.invalidateToken(activity, null);
-			accessProvider.getAuthToken(activity, null);
+			// accessProvider.logout(activity);
+			accessProvider.login(activity, null);
 		} catch (Exception e) {
-			Log.e(getClass().getName(),""+ e.getMessage());
+			Log.e(getClass().getName(), "" + e.getMessage());
 			PMHelper.showFailure(activity, eu.trentorise.smartcampus.portfolio.R.string.app_failure_security);
 		}
 	}

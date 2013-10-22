@@ -16,6 +16,7 @@
 package eu.trentorise.smartcampus.portfolio;
 
 import android.accounts.AccountManager;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SlidingDrawer;
@@ -32,9 +34,8 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Window;
 
-import eu.trentorise.smartcampus.portfolio.R;
+import eu.trentorise.smartcampus.ac.AACException;
 import eu.trentorise.smartcampus.ac.SCAccessProvider;
 import eu.trentorise.smartcampus.android.common.SCAsyncTask;
 import eu.trentorise.smartcampus.portfolio.frags.PortfolioFragment;
@@ -49,6 +50,7 @@ import eu.trentorise.smartcampus.portfolio.scutils.Constants;
 import eu.trentorise.smartcampus.portfolio.user.Notes;
 import eu.trentorise.smartcampus.portfolio.utils.AbstractAsyncTaskProcessor;
 import eu.trentorise.smartcampus.portfolio.utils.SoftKeyboard;
+import eu.trentorise.smartcampus.protocolcarrier.exceptions.ConnectionException;
 import eu.trentorise.smartcampus.protocolcarrier.exceptions.SecurityException;
 import eu.trentorise.smartcampus.storage.DataException;
 
@@ -58,8 +60,7 @@ import eu.trentorise.smartcampus.storage.DataException;
  * @author Simone Casagranda
  * 
  */
-public class HomeActivity extends SherlockFragmentActivity implements FragmentLoader, NoteLayerInteractor,
-		SharedPortfolio {
+public class HomeActivity extends SherlockFragmentActivity implements FragmentLoader, NoteLayerInteractor, SharedPortfolio {
 
 	private Button mSlidingButton;
 	private EditText mNotesEditText;
@@ -69,10 +70,12 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 
 	private Boolean owned = null;
 	private Long mPortfolioEntityId;
-	
+
 	private SharedPortfolioContainer sharedPortfolioContainer;
 	private boolean initialized = false;
-	
+
+	private String userAuthToken;
+
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
@@ -81,7 +84,7 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 			outState.putParcelable("sharedPortfolio", sharedPortfolioContainer);
 		}
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -116,7 +119,9 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 	private void initDataManagement(Bundle savedInstanceState) {
 		try {
 			PMHelper.init(getApplicationContext());
-			String token = PMHelper.getAccessProvider().getAuthToken(this, null);
+			// String token = PMHelper.getAccessProvider().getAuthToken(this,
+			// null);
+			String token = PMHelper.getAuthToken();
 			if (token != null) {
 				initData(token, savedInstanceState);
 			}
@@ -134,7 +139,7 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 				Fragment frag = new PortfoliosListFragment();
 				ft.replace(R.id.fragment_container, frag).commitAllowingStateLoss();
 			} else if (savedInstanceState != null && savedInstanceState.containsKey("sharedPortfolio")) {
-				sharedPortfolioContainer =  savedInstanceState.getParcelable("sharedPortfolio");
+				sharedPortfolioContainer = savedInstanceState.getParcelable("sharedPortfolio");
 				if (!sharedPortfolioContainer.getPortfolio().entityId.equals(mPortfolioEntityId)) {
 					new LoadPortfolioAsyncTask().execute(mPortfolioEntityId);
 				}
@@ -152,6 +157,18 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		initDataManagement(savedInstanceState);
+
+		try {
+			if (!PMHelper.getAccessProvider().login(this, null)) {
+				new SCAsyncTask<Void, Void, String>(this, new LoadUserDataFromACServiceTask(HomeActivity.this)).execute();
+			}
+		} catch (AACException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		// Asking for windows features
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		// Setting content view
@@ -195,7 +212,7 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 		if (isViewer()) {
 			mPortfolioEntityId = getIntent().getLongExtra(getString(R.string.view_intent_arg_entity_id), -1);
 		}
-		initDataManagement(savedInstanceState);
+
 		initialized = true;
 	}
 
@@ -206,8 +223,8 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 		setSupportProgressBarIndeterminateVisibility(false);
 		// Starting notes task for loading notes
 		cancelNotesTask();
-//		mNotesTask = new NotesAsyncTask();
-//		mNotesTask.execute(false);
+		// mNotesTask = new NotesAsyncTask();
+		// mNotesTask.execute(false);
 	}
 
 	@Override
@@ -250,12 +267,14 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 	@Override
 	public boolean isOwned() {
 		if (owned == null) {
-			if (!isViewer()) owned = true;
+			if (!isViewer())
+				owned = true;
 			else {
 				try {
-					owned = PMHelper.isOwnPortfolio(mPortfolioEntityId);;
+					owned = PMHelper.isOwnPortfolio(mPortfolioEntityId);
+					;
 				} catch (Exception e) {
-					Log.e(getClass().getName(), ""+e.getMessage());
+					Log.e(getClass().getName(), "" + e.getMessage());
 					owned = false;
 				}
 			}
@@ -266,7 +285,7 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 	private boolean isViewer() {
 		return Constants.ACTION_VIEW.equals(getIntent().getAction());
 	}
-	
+
 	@Override
 	public int getPermissionLevel() {
 		// Here you can manage permission level for children
@@ -301,18 +320,36 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		if (resultCode == RESULT_OK) {
-			String token = data.getExtras().getString(
-					AccountManager.KEY_AUTHTOKEN);
-			if (token == null) {
-				PMHelper.endAppFailure(this, R.string.app_failure_security);
-			} else {
-				initData(token, null);
+		// super.onActivityResult(requestCode, resultCode, data);
+		// if (resultCode == RESULT_OK) {
+		// String token = data.getExtras().getString(
+		// AccountManager.KEY_AUTHTOKEN);
+		// if (token == null) {
+		// PMHelper.endAppFailure(this, R.string.app_failure_security);
+		// } else {
+		// initData(token, null);
+		// }
+		// } else if (resultCode == RESULT_CANCELED && requestCode ==
+		// SCAccessProvider.SC_AUTH_ACTIVITY_REQUEST_CODE) {
+		// PMHelper.endAppFailure(this,
+		// eu.trentorise.smartcampus.ac.R.string.token_required);
+		// }
+
+		if (requestCode == SCAccessProvider.SC_AUTH_ACTIVITY_REQUEST_CODE) {
+			if (resultCode == RESULT_OK) {
+				String token = data.getExtras().getString(AccountManager.KEY_AUTHTOKEN);
+				PMHelper.mToken = token;
+				if (token == null) {
+					PMHelper.endAppFailure(this, R.string.app_failure_security);
+				} else {
+					initData(token, null);
+				}
+			} else if (resultCode == RESULT_CANCELED && requestCode == SCAccessProvider.SC_AUTH_ACTIVITY_REQUEST_CODE) {
+				PMHelper.endAppFailure(this, R.string.token_required);
 			}
-		} else if (resultCode == RESULT_CANCELED && requestCode == SCAccessProvider.SC_AUTH_ACTIVITY_REQUEST_CODE) {
-			PMHelper.endAppFailure(this, eu.trentorise.smartcampus.ac.R.string.token_required);
 		}
+		super.onActivityResult(requestCode, resultCode, data);
+
 	}
 
 	/**
@@ -329,6 +366,7 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 					}
 					return PMHelper.getNotes();
 				}
+
 				@Override
 				public void handleResult(String result) {
 					mNotesEditText.setText(result);
@@ -347,18 +385,20 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 				@Override
 				public Portfolio performAction(Long... params) throws SecurityException, Exception {
 					Portfolio p = null;
-					if (params != null && params.length > 0  && params[0] != null) {
+					if (params != null && params.length > 0 && params[0] != null) {
 						owned = PMHelper.isOwnPortfolio(params[0]);
 						if (owned) {
 							p = PMHelper.findPortfolio(params[0]);
 						} else {
 							sharedPortfolioContainer = PMHelper.getSharedPortfolioContainer(params[0]);
-							if (sharedPortfolioContainer == null) throw new DataException("No portfolio found");
+							if (sharedPortfolioContainer == null)
+								throw new DataException("No portfolio found");
 							p = sharedPortfolioContainer.getPortfolio();
 						}
 					}
 					return p;
 				}
+
 				@Override
 				public void handleResult(Portfolio result) {
 					if (result != null) {
@@ -377,70 +417,92 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 		return sharedPortfolioContainer;
 	}
 
-	 @Override
+	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 	}
-//	private class NotesTask extends AsyncTask<Void, String, Integer> {
-//
-//		private static final int OK = 0, NO_CONNECTION = 1, SERVER_UNREACHABLE = 2;
-//
-//		private boolean mStoreNotes;
-//
-//		public NotesTask(boolean storeNotes) {
-//			mStoreNotes = storeNotes;
-//		}
-//
-//		@Override
-//		protected void onPreExecute() {
-//			super.onPreExecute();
-//			// Showing progress bar
-//			showProgressBar(true);
-//		}
-//
-//		@Override
-//		protected void onProgressUpdate(String... values) {
-//			// Setting text
-//			mNotesEditText.setText(values[0]);
-//			// Moving cursor to last position
-//			Selection.setSelection(mNotesEditText.getText(), mNotesEditText.length());
-//		}
-//
-//		@Override
-//		protected Integer doInBackground(Void... params) {
-//			// Preparing app configurations
-//			// Checking if we have to store or load notes
-//			if (mStoreNotes) {
-//				// Storing user notes
-//				PMHelper.setNotes(mNotesEditText.getText().toString());
-//			} else {
-//				publishProgress(PMHelper.getNotes());
-//			}
-//			return OK;
-//		}
-//
-//		@Override
-//		protected void onPostExecute(Integer result) {
-//			super.onPostExecute(result);
-//			// Hiding progress bar
-//			showProgressBar(false);
-//			// Checking result
-//			switch (result) {
-//			case NO_CONNECTION:
-//				// Here you can ask to activate connection
-//				break;
-//			case SERVER_UNREACHABLE:
-//				// Here you can advise user that the server is unreachable
-//				break;
-//			default:
-//				break;
-//			}
-//		}
-//
-//		private void showProgressBar(boolean show) {
-//			setSupportProgressBarIndeterminateVisibility(show);
-//		}
-//
-//	}
-	
+
+	// private class NotesTask extends AsyncTask<Void, String, Integer> {
+	//
+	// private static final int OK = 0, NO_CONNECTION = 1, SERVER_UNREACHABLE =
+	// 2;
+	//
+	// private boolean mStoreNotes;
+	//
+	// public NotesTask(boolean storeNotes) {
+	// mStoreNotes = storeNotes;
+	// }
+	//
+	// @Override
+	// protected void onPreExecute() {
+	// super.onPreExecute();
+	// // Showing progress bar
+	// showProgressBar(true);
+	// }
+	//
+	// @Override
+	// protected void onProgressUpdate(String... values) {
+	// // Setting text
+	// mNotesEditText.setText(values[0]);
+	// // Moving cursor to last position
+	// Selection.setSelection(mNotesEditText.getText(),
+	// mNotesEditText.length());
+	// }
+	//
+	// @Override
+	// protected Integer doInBackground(Void... params) {
+	// // Preparing app configurations
+	// // Checking if we have to store or load notes
+	// if (mStoreNotes) {
+	// // Storing user notes
+	// PMHelper.setNotes(mNotesEditText.getText().toString());
+	// } else {
+	// publishProgress(PMHelper.getNotes());
+	// }
+	// return OK;
+	// }
+	//
+	// @Override
+	// protected void onPostExecute(Integer result) {
+	// super.onPostExecute(result);
+	// // Hiding progress bar
+	// showProgressBar(false);
+	// // Checking result
+	// switch (result) {
+	// case NO_CONNECTION:
+	// // Here you can ask to activate connection
+	// break;
+	// case SERVER_UNREACHABLE:
+	// // Here you can advise user that the server is unreachable
+	// break;
+	// default:
+	// break;
+	// }
+	// }
+	//
+	// private void showProgressBar(boolean show) {
+	// setSupportProgressBarIndeterminateVisibility(show);
+	// }
+	//
+	// }
+
+	public class LoadUserDataFromACServiceTask extends AbstractAsyncTaskProcessor<Void, String> {
+
+		public LoadUserDataFromACServiceTask(Activity activity) {
+			super(activity);
+		}
+
+		@Override
+		public String performAction(Void... params) throws SecurityException, ConnectionException, Exception {
+			userAuthToken = PMHelper.getAccessProvider().readToken(getApplicationContext());
+			PMHelper.mToken = userAuthToken;
+			return userAuthToken;
+		}
+
+		@Override
+		public void handleResult(String result) {
+			PMHelper.mToken = result;
+		}
+	}
+
 }
