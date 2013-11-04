@@ -62,7 +62,7 @@ public class PMHelper {
 	private static RemoteStorage remoteStorage = null;
 	private static SCAccessProvider accessProvider = null;
 
-	public static String mToken;
+	private static String mToken;
 
 	// cached notes
 	private UserData userData = null;
@@ -116,6 +116,7 @@ public class PMHelper {
 	}
 
 	public static String getAuthToken() throws AACException {
+		mToken = PMHelper.getAccessProvider().readToken(mContext);
 		return mToken;
 	}
 

@@ -16,7 +16,6 @@
 package eu.trentorise.smartcampus.portfolio;
 
 import android.accounts.AccountManager;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -50,7 +49,6 @@ import eu.trentorise.smartcampus.portfolio.scutils.Constants;
 import eu.trentorise.smartcampus.portfolio.user.Notes;
 import eu.trentorise.smartcampus.portfolio.utils.AbstractAsyncTaskProcessor;
 import eu.trentorise.smartcampus.portfolio.utils.SoftKeyboard;
-import eu.trentorise.smartcampus.protocolcarrier.exceptions.ConnectionException;
 import eu.trentorise.smartcampus.protocolcarrier.exceptions.SecurityException;
 import eu.trentorise.smartcampus.storage.DataException;
 
@@ -162,7 +160,7 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 
 		try {
 			if (!PMHelper.getAccessProvider().login(this, null)) {
-				new SCAsyncTask<Void, Void, String>(this, new LoadUserDataFromACServiceTask(HomeActivity.this)).execute();
+				PMHelper.getAuthToken();
 			}
 		} catch (AACException e) {
 			// TODO Auto-generated catch block
@@ -338,7 +336,6 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 		if (requestCode == SCAccessProvider.SC_AUTH_ACTIVITY_REQUEST_CODE) {
 			if (resultCode == RESULT_OK) {
 				String token = data.getExtras().getString(AccountManager.KEY_AUTHTOKEN);
-				PMHelper.mToken = token;
 				if (token == null) {
 					PMHelper.endAppFailure(this, R.string.app_failure_security);
 				} else {
@@ -485,24 +482,5 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 	// }
 	//
 	// }
-
-	public class LoadUserDataFromACServiceTask extends AbstractAsyncTaskProcessor<Void, String> {
-
-		public LoadUserDataFromACServiceTask(Activity activity) {
-			super(activity);
-		}
-
-		@Override
-		public String performAction(Void... params) throws SecurityException, ConnectionException, Exception {
-			userAuthToken = PMHelper.getAccessProvider().readToken(getApplicationContext());
-			PMHelper.mToken = userAuthToken;
-			return userAuthToken;
-		}
-
-		@Override
-		public void handleResult(String result) {
-			PMHelper.mToken = result;
-		}
-	}
 
 }
