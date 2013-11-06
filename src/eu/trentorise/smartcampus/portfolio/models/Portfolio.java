@@ -37,7 +37,7 @@ public class Portfolio extends BasicObject implements Parcelable {
 	public String name;
 	// public String sharedWith;
 	public List<Concept> tags;
-	public Long entityId;
+	public String entityId;
 	
 	public List<String> showUserGeneratedData = new ArrayList<String>();
 	public List<String> highlightUserGeneratedData = new ArrayList<String>();
@@ -51,7 +51,7 @@ public class Portfolio extends BasicObject implements Parcelable {
 		userId = source.readString();
 		timestamp = source.readLong();
 		name = source.readString();
-		entityId = source.readLong();
+		entityId = source.readString();
 		// sharedWith = source.readString();
 		source.readStringList(showUserGeneratedData);
 		source.readStringList(highlightUserGeneratedData);
@@ -70,7 +70,7 @@ public class Portfolio extends BasicObject implements Parcelable {
 		dest.writeString(userId);
 		dest.writeLong(timestamp);
 		dest.writeString(name);
-		dest.writeLong(entityId);
+		dest.writeString(entityId);
 		// dest.writeString(sharedWith);
 		dest.writeStringList(showUserGeneratedData);
 		dest.writeStringList(highlightUserGeneratedData);

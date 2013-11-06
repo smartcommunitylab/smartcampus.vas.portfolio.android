@@ -67,7 +67,7 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 	private NotesAsyncTask mNotesTask;
 
 	private Boolean owned = null;
-	private Long mPortfolioEntityId;
+	private String mPortfolioEntityId;
 
 	private SharedPortfolioContainer sharedPortfolioContainer;
 	private boolean initialized = false;
@@ -208,7 +208,7 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 		});
 		// Checking start action
 		if (isViewer()) {
-			mPortfolioEntityId = getIntent().getLongExtra(getString(R.string.view_intent_arg_entity_id), -1);
+			mPortfolioEntityId = getIntent().getStringExtra(getString(R.string.view_intent_arg_entity_id));
 		}
 
 		initialized = true;
@@ -291,7 +291,7 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 	}
 
 	@Override
-	public Long getPortfolioEntityId() {
+	public String getPortfolioEntityId() {
 		return mPortfolioEntityId;
 	}
 
@@ -375,12 +375,12 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 	/**
 	 * AsyncTask that allows to store and retrieve notes
 	 */
-	private class LoadPortfolioAsyncTask extends SCAsyncTask<Long, Void, Portfolio> {
+	private class LoadPortfolioAsyncTask extends SCAsyncTask<String, Void, Portfolio> {
 
 		public LoadPortfolioAsyncTask() {
-			super(HomeActivity.this, new AbstractAsyncTaskProcessor<Long, Portfolio>(HomeActivity.this) {
+			super(HomeActivity.this, new AbstractAsyncTaskProcessor<String, Portfolio>(HomeActivity.this) {
 				@Override
-				public Portfolio performAction(Long... params) throws SecurityException, Exception {
+				public Portfolio performAction(String... params) throws SecurityException, Exception {
 					Portfolio p = null;
 					if (params != null && params.length > 0 && params[0] != null) {
 						owned = PMHelper.isOwnPortfolio(params[0]);

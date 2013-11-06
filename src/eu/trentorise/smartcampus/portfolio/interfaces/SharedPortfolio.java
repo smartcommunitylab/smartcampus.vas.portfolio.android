@@ -31,7 +31,7 @@ public interface SharedPortfolio {
 	
 	public int getPermissionLevel();
 	
-	public Long getPortfolioEntityId();
+	public String getPortfolioEntityId();
 	
 	public SharedPortfolioContainer getContainer();
 }

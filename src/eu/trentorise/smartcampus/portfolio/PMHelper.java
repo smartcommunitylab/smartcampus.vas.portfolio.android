@@ -23,12 +23,13 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.widget.Toast;
 import eu.trentorise.smartcampus.ac.AACException;
 import eu.trentorise.smartcampus.ac.SCAccessProvider;
+import eu.trentorise.smartcampus.android.common.AppHelper;
 import eu.trentorise.smartcampus.android.common.Utils;
 import eu.trentorise.smartcampus.android.common.tagging.SemanticSuggestion;
 import eu.trentorise.smartcampus.android.common.tagging.SuggestionHelper;
@@ -50,6 +51,7 @@ import eu.trentorise.smartcampus.protocolcarrier.custom.MessageResponse;
 import eu.trentorise.smartcampus.protocolcarrier.exceptions.ConnectionException;
 import eu.trentorise.smartcampus.protocolcarrier.exceptions.ProtocolException;
 import eu.trentorise.smartcampus.protocolcarrier.exceptions.SecurityException;
+import eu.trentorise.smartcampus.social.model.Entity;
 import eu.trentorise.smartcampus.storage.DataException;
 import eu.trentorise.smartcampus.storage.remote.RemoteStorage;
 
@@ -77,6 +79,8 @@ public class PMHelper {
 	// cached user produced data
 	private List<UserProducedData> userProducedData;
 
+	public static final String ENTITY_TYPE_PORTFOLIO = "portfolio";
+	
 	protected PMHelper(Context mContext) {
 		super();
 		this.mContext = mContext;
@@ -296,7 +300,7 @@ public class PMHelper {
 		}
 	}
 
-	public static Portfolio getPortfolio(Long portfolioEntityId) throws NameNotFoundException, DataException,
+	public static Portfolio getPortfolio(String portfolioEntityId) throws NameNotFoundException, DataException,
 			ConnectionException, ProtocolException, SecurityException, AACException {
 		if (portfolioEntityId == null)
 			return null;
@@ -308,7 +312,7 @@ public class PMHelper {
 		return null;
 	}
 
-	public static Portfolio findPortfolio(Long portfolioEntityId) throws NameNotFoundException, DataException,
+	public static Portfolio findPortfolio(String portfolioEntityId) throws NameNotFoundException, DataException,
 			ConnectionException, ProtocolException, SecurityException, AACException {
 		Portfolio p = getPortfolio(portfolioEntityId);
 		if (p == null) {
@@ -324,7 +328,7 @@ public class PMHelper {
 		return p;
 	}
 
-	public static Boolean isOwnPortfolio(Long portfolioEntityId) throws NameNotFoundException, DataException,
+	public static Boolean isOwnPortfolio(String portfolioEntityId) throws NameNotFoundException, DataException,
 			ConnectionException, ProtocolException, SecurityException, AACException {
 		if (portfolioEntityId == null)
 			return false;
@@ -415,7 +419,7 @@ public class PMHelper {
 		return new ArrayList<UserProducedData>();
 	}
 
-	public static SharedPortfolioContainer getSharedPortfolioContainer(Long id) throws ConnectionException, ProtocolException,
+	public static SharedPortfolioContainer getSharedPortfolioContainer(String id) throws ConnectionException, ProtocolException,
 			SecurityException, AACException {
 		MessageRequest request = new MessageRequest(Preferences.getHost(mContext), Preferences.getService()
 				+ "/eu.trentorise.smartcampus.portfolio.models.SharedPortfolioContainer/" + id);
@@ -426,4 +430,14 @@ public class PMHelper {
 		return Utils.convertJSONToObject(response.getBody(), SharedPortfolioContainer.class);
 	}
 
+	public static void share(Portfolio exp, Activity ctx) {
+		Entity obj = new Entity();
+		obj.setEntityId(exp.entityId);
+		obj.setTitle(exp.name);
+		obj.setEntityType(ENTITY_TYPE_PORTFOLIO);
+		Intent intent = new Intent();
+		intent.setAction(ctx.getString(eu.trentorise.smartcampus.android.common.R.string.share_intent_action));
+		intent.putExtra(ctx.getString(eu.trentorise.smartcampus.android.common.R.string.share_entity_arg_entity), obj);
+		AppHelper.startActivityForApp(intent, ctx);
+	}
 }

@@ -71,13 +71,13 @@
             android:background="@color/item_switcher_view_background"
             android:src="@drawable/ic_edit" />
 
-        <ImageButton
-            android:id="@+id/follow"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@color/item_switcher_view_background"
-            android:src="@drawable/ic_follow" />
+<!--         <ImageButton -->
+<!--             android:id="@+id/follow" -->
+<!--             android:layout_width="match_parent" -->
+<!--             android:layout_height="match_parent" -->
+<!--             android:layout_weight="1" -->
+<!--             android:background="@color/item_switcher_view_background" -->
+<!--             android:src="@drawable/ic_follow" /> -->
     </LinearLayout>
 
     <!-- Portfolio title (Visible view) -->

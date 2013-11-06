@@ -53,10 +53,6 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 import eu.trentorise.smartcampus.android.common.SCAsyncTask;
-import eu.trentorise.smartcampus.android.common.follow.FollowEntityObject;
-import eu.trentorise.smartcampus.android.common.follow.FollowHelper;
-import eu.trentorise.smartcampus.android.common.sharing.ShareEntityObject;
-import eu.trentorise.smartcampus.android.common.sharing.SharingHelper;
 import eu.trentorise.smartcampus.android.common.tagging.SemanticSuggestion;
 import eu.trentorise.smartcampus.android.common.tagging.SuggestionHelper;
 import eu.trentorise.smartcampus.android.common.tagging.TaggingDialog;
@@ -246,10 +242,9 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 			try {
 				return PMHelper.exportPortfolio(params[0]);
 			} catch (Exception e) {
+				e.printStackTrace();
 				Log.e(this.getClass().getSimpleName(),
 						"Exception getting portfolio export from server");
-				ToastBuilder.showShort(getActivity(),
-						"An error occurred exporting portfolio");
 			}
 			return null;
 		}
@@ -290,6 +285,8 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 							.showShort(getActivity(),
 									"You have to install a pdf reader app to export the portfolio");
 				}
+			} else {
+				ToastBuilder.showShort(getActivity(), "An error occurred exporting portfolio");
 			}
 
 		}
@@ -304,7 +301,6 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 	private class PorfolioAdapter extends ArrayAdapter<Portfolio> implements
 			OnScrollListener, OnItemLongClickListener, OnItemClickListener {
 
-		public static final String ENTITY_TYPE_PORTFOLIO = "portfolio";
 
 		private static final int NOT_VALID_POSITION = -1;
 
@@ -316,7 +312,7 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 			View visibleView, hiddenView;
 			TextView portfolioNameTextView;
 			ImageButton trashButton, exportButton, shareButton;
-			ImageButton tagButton, editButton, followButton;
+			ImageButton tagButton, editButton;
 		}
 
 		public PorfolioAdapter(Context context, List<Portfolio> objects) {
@@ -350,8 +346,6 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 						.findViewById(R.id.tag);
 				holder.editButton = (ImageButton) convertView
 						.findViewById(R.id.edit);
-				holder.followButton = (ImageButton) convertView
-						.findViewById(R.id.follow);
 				// add Holder to View
 				convertView.setTag(holder);
 			} else {
@@ -417,9 +411,7 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 			holder.shareButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					ShareEntityObject obj = new ShareEntityObject(p.entityId,
-							p.name, ENTITY_TYPE_PORTFOLIO);
-					SharingHelper.share(getActivity(), obj);
+					PMHelper.share(p, getActivity());
 				}
 			});
 			holder.tagButton.setOnClickListener(new OnClickListener() {
@@ -449,14 +441,6 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 					// Loading edit portfolio fragment
 					mFragmentLoader.load(PortfolioFragment.class, true,
 							PortfolioFragment.prepareArguments(p, true));
-				}
-			});
-			holder.followButton.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					FollowEntityObject obj = new FollowEntityObject(p.entityId,
-							p.name, ENTITY_TYPE_PORTFOLIO);
-					FollowHelper.follow(getActivity(), obj);
 				}
 			});
 			// Hiding visible view if it's the one hidden at position n
