@@ -50,7 +50,6 @@ import eu.trentorise.smartcampus.portfolio.user.Notes;
 import eu.trentorise.smartcampus.portfolio.utils.AbstractAsyncTaskProcessor;
 import eu.trentorise.smartcampus.portfolio.utils.SoftKeyboard;
 import eu.trentorise.smartcampus.protocolcarrier.exceptions.SecurityException;
-import eu.trentorise.smartcampus.storage.DataException;
 
 /**
  * FragmentActivity that works as container for all Fragments.
@@ -117,18 +116,12 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 	private void initDataManagement(Bundle savedInstanceState) {
 		try {
 			PMHelper.init(getApplicationContext());
-			// String token = PMHelper.getAccessProvider().getAuthToken(this,
-			// null);
-			String token = PMHelper.getAuthToken();
-			if (token != null) {
-				initData(token, savedInstanceState);
-			}
 		} catch (Exception e) {
 			PMHelper.endAppFailure(this, R.string.app_failure_setup);
 		}
 	}
 
-	private boolean initData(String token, Bundle savedInstanceState) {
+	private boolean initData(Bundle savedInstanceState) {
 		try {
 			// Loading first fragment that works as home for application.
 			// Getting token
@@ -156,15 +149,20 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		// Checking start action
+		if (isViewer()) {
+			mPortfolioEntityId = getIntent().getStringExtra(getString(R.string.view_intent_arg_object_id));
+		}
+
 		initDataManagement(savedInstanceState);
 
 		try {
 			if (!PMHelper.getAccessProvider().login(this, null)) {
-				PMHelper.getAuthToken();
+				initData(savedInstanceState);
 			}
 		} catch (AACException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			PMHelper.endAppFailure(this, R.string.app_failure_setup);
+			return;
 		}
 
 		// Asking for windows features
@@ -206,10 +204,6 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 				}
 			}
 		});
-		// Checking start action
-		if (isViewer()) {
-			mPortfolioEntityId = getIntent().getStringExtra(getString(R.string.view_intent_arg_entity_id));
-		}
 
 		initialized = true;
 	}
@@ -339,7 +333,7 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 				if (token == null) {
 					PMHelper.endAppFailure(this, R.string.app_failure_security);
 				} else {
-					initData(token, null);
+					initData(null);
 				}
 			} else if (resultCode == RESULT_CANCELED && requestCode == SCAccessProvider.SC_AUTH_ACTIVITY_REQUEST_CODE) {
 				PMHelper.endAppFailure(this, R.string.token_required);
@@ -388,8 +382,7 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 							p = PMHelper.findPortfolio(params[0]);
 						} else {
 							sharedPortfolioContainer = PMHelper.getSharedPortfolioContainer(params[0]);
-							if (sharedPortfolioContainer == null)
-								throw new DataException("No portfolio found");
+							if (sharedPortfolioContainer == null) return null;
 							p = sharedPortfolioContainer.getPortfolio();
 						}
 					}
@@ -403,6 +396,8 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 						Fragment frag = new PortfolioFragment();
 						frag.setArguments(PortfolioFragment.prepareArguments(result, false));
 						ft.replace(R.id.fragment_container, frag).commit();
+					} else {
+						Toast.makeText(HomeActivity.this, R.string.not_found_portfolios, Toast.LENGTH_LONG).show();
 					}
 				}
 			});
