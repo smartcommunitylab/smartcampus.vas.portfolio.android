@@ -15,6 +15,10 @@
  ******************************************************************************/
 package eu.trentorise.smartcampus.portfolio.frags;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,7 +27,13 @@ import java.util.HashSet;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -37,15 +47,15 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.SubMenu;
 
-import eu.trentorise.smartcampus.ac.SCAccessProvider;
 import eu.trentorise.smartcampus.android.common.SCAsyncTask;
-import eu.trentorise.smartcampus.android.common.SCAsyncTask.SCAsyncTaskProcessor;
 import eu.trentorise.smartcampus.android.common.tagging.SemanticSuggestion;
 import eu.trentorise.smartcampus.android.common.tagging.SuggestionHelper;
 import eu.trentorise.smartcampus.android.common.tagging.TaggingDialog;
@@ -65,6 +75,7 @@ import eu.trentorise.smartcampus.portfolio.scutils.PortfolioUtil.CategorizedData
 import eu.trentorise.smartcampus.portfolio.utils.AbstractAsyncTaskProcessor;
 import eu.trentorise.smartcampus.portfolio.utils.OptionItem;
 import eu.trentorise.smartcampus.portfolio.utils.ToastBuilder;
+import eu.trentorise.smartcampus.portfolio.utils.WelcomeDlgHelper;
 import eu.trentorise.smartcampus.protocolcarrier.exceptions.ConnectionException;
 import eu.trentorise.smartcampus.protocolcarrier.exceptions.ProtocolException;
 import eu.trentorise.smartcampus.protocolcarrier.exceptions.SecurityException;
@@ -85,8 +96,12 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 	private static final String OPTION_ITEMS_LIST = "OPTION_ITEMS_LIST";
 	private static final String UPDATED_CATEGORIES = "UPDATED_CATEGORIES";
 
+	private static final int MODIFY_PORTFOLIO = 16;
 	private static final int EDIT_PORTFOLIO = 15;
-	private static final int TAG_PORTFOLIO = 14;
+	private static final int TRASH_PORTFOLIO = 17;
+	private static final int EXPORT_PORTFOLIO = 18;
+	private static final int SHARE_PORTFOLIO = 19;
+	private static final int TAG_PORTFOLIO = 20;
 
 	// UI References
 	private TextView mTitleTextView, mTagsTextView;
@@ -105,8 +120,8 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 
 	// Other variables
 	// private TagTask mTagTask;
-//	private CategoryAsyncTask mCategoryTask;
-//	private PortfolioAsyncTask mPortfolioTask;
+	// private CategoryAsyncTask mCategoryTask;
+	// private PortfolioAsyncTask mPortfolioTask;
 	private LoadAsyncTask mLoadTask;
 
 	private CategoryArrayAdapter mAdapter;
@@ -184,28 +199,143 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		// Adding all items
-		for (OptionItem item : mOptionItems) {
-			menu.add(Menu.NONE, item.id, Menu.NONE, item.res).setIcon(item.icon)
-					.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-		}
+		 inflater.inflate(R.menu.fragment_menu, menu);
+			if (!mEditEnabled) {
+				 menu.findItem(R.id.mainmenu_edit).setVisible(true);
+				 menu.findItem(R.id.mainmenu_modify).setVisible(true);
+
+			}
+			else {
+				 menu.findItem(R.id.mainmenu_edit).setVisible(false);
+				 menu.findItem(R.id.mainmenu_modify).setVisible(false);
+
+			}
+//		for (OptionItem item : mOptionItems) {
+//			if (item.getVisible()) {
+//				menu.add(Menu.NONE, item.id, Menu.NONE, item.res).setIcon(item.icon)
+//						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+//			} else {
+//				menu.add(Menu.NONE, item.id, Menu.NONE, item.res).setIcon(item.icon)
+//				.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+//			}
+//		}
+
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case TAG_PORTFOLIO:
+		case R.id.mainmenu_tag:
 			TaggingDialog taggingDialog = new TaggingDialog(getActivity(), PortfolioFragment.this,
 					PortfolioFragment.this, Concept.convertToSS(mPortfolio.tags));
 			taggingDialog.show();
 			// mFragmentLoader.load(AddTagFragment.class, true,
 			// AddTagFragment.prepareArguments(mPortfolio));
 			return true;
-		case EDIT_PORTFOLIO:
+		case R.id.mainmenu_edit:
 			setEditMode(true);
+			return true;
+		case R.id.mainmenu_modify:
+			PMHelper.openPortfolioInBrowser(getSherlockActivity());
+			return true;
+		case R.id.mainmenu_trash:
+			deletePortfolio();
+			return true;
+		case R.id.mainmenu_export:
+			new PortfolioExportAsyncTask().execute(mPortfolio.getId());
+			return true;
+		case R.id.mainmenu_share:
+			PMHelper.share(mPortfolio, getActivity());
+			return true;
+		case R.id.refresh_portfolios:
+			refreshPortfolio();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+
+	private void refreshPortfolio() {
+		new PortfolioRefreshAsyncTask().execute();
+		
+	}
+	private class PortfolioRefreshAsyncTask extends SCAsyncTask<Void, Void, List<Portfolio>> {
+
+		public PortfolioRefreshAsyncTask() {
+			super(getSherlockActivity(), new AbstractAsyncTaskProcessor<Void, List<Portfolio>>(getSherlockActivity()) {
+				@Override
+				public List<Portfolio> performAction(Void... params) throws SecurityException, Exception {
+					PMHelper.removeAllPortfolios();
+					return PMHelper.getPortfolioList();
+				}
+
+				@Override
+				public void handleResult(List<Portfolio> result) {
+					if (result != null) {
+						//clear data e find if there is the same portfolio
+						for (Portfolio portfolio:result){
+							if (portfolio.getId().equals(mPortfolio.getId()))
+							{
+								//aggiorna il dato
+								mPortfolio = portfolio;
+								if (mPortfolio == null) {
+									// Starting new task for portfolio
+									// mPortfolioTask = new PortfolioAsyncTask();
+									// mPortfolioTask.execute();
+									mLoadTask = new LoadAsyncTask();
+									mLoadTask.execute(true);
+								} else {
+									// // Starting new task for tags
+									// mTagTask = new TagTask();
+									// mTagTask.execute();
+									// Starting new task for categories
+									// mCategoryTask = new CategoryAsyncTask();
+									// mCategoryTask.execute();
+									mLoadTask = new LoadAsyncTask();
+									mLoadTask.execute(false);
+								}
+								return;
+							}
+						}
+						getSherlockActivity().getSupportFragmentManager().popBackStack();
+					}
+
+				}
+			});
+		}
+	}
+	
+	private void deletePortfolio() {
+
+		// create a dialog alarm that ask if you are sure
+		AlertDialog.Builder builder = new AlertDialog.Builder(getSherlockActivity());
+		// Add the buttons
+		builder.setMessage(getSherlockActivity().getString(R.string.sure_delete_portfolio));
+		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				// // User clicked OK button
+				// // Removing portfolio
+				// if (mPortfolioAsyncTask != null &&
+				// !mPortfolioAsyncTask.isCancelled()) {
+				// mPortfolioAsyncTask.cancel(true);
+				// }
+				// openedItem = NOT_VALID_POSITION;
+				new SCAsyncTask<Portfolio, Void, List<Portfolio>>(getSherlockActivity(), new RemoveTaskProcessor(
+						getSherlockActivity())).execute(mPortfolio);
+			}
+		});
+		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				// User cancelled the dialog
+				dialog.dismiss();
+			}
+		});
+
+		// Create the AlertDialog
+		AlertDialog dialog = builder.create();
+		// remove the element from the array
+		dialog.show();
+
 	}
 
 	@Override
@@ -258,7 +388,8 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 		mSaveButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				new SCAsyncTask<Void, Void, Void>(getSherlockActivity(), new SaveTaskProcessor(getSherlockActivity())).execute();
+				new SCAsyncTask<Void, Void, Void>(getSherlockActivity(), new SaveTaskProcessor(getSherlockActivity()))
+						.execute();
 			}
 		});
 		mCancelButton.setOnClickListener(new OnClickListener() {
@@ -336,8 +467,8 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 		// Checking if we are in shared or owned mode
 		if (mPortfolio == null) {
 			// Starting new task for portfolio
-//			mPortfolioTask = new PortfolioAsyncTask();
-//			mPortfolioTask.execute();
+			// mPortfolioTask = new PortfolioAsyncTask();
+			// mPortfolioTask.execute();
 			mLoadTask = new LoadAsyncTask();
 			mLoadTask.execute(true);
 		} else {
@@ -345,8 +476,8 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 			// mTagTask = new TagTask();
 			// mTagTask.execute();
 			// Starting new task for categories
-//			mCategoryTask = new CategoryAsyncTask();
-//			mCategoryTask.execute();
+			// mCategoryTask = new CategoryAsyncTask();
+			// mCategoryTask.execute();
 			mLoadTask = new LoadAsyncTask();
 			mLoadTask.execute(false);
 		}
@@ -356,12 +487,12 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 		// if (mTagTask != null && !mTagTask.isCancelled()) {
 		// mTagTask.cancel(true);
 		// }
-//		if (mCategoryTask != null && !mCategoryTask.isCancelled()) {
-//			mCategoryTask.cancel(true);
-//		}
-//		if (mPortfolioTask != null && !mPortfolioTask.isCancelled()) {
-//			mPortfolioTask.cancel(true);
-//		}
+		// if (mCategoryTask != null && !mCategoryTask.isCancelled()) {
+		// mCategoryTask.cancel(true);
+		// }
+		// if (mPortfolioTask != null && !mPortfolioTask.isCancelled()) {
+		// mPortfolioTask.cancel(true);
+		// }
 		if (mLoadTask != null && !mLoadTask.isCancelled()) {
 			mLoadTask.cancel(true);
 		}
@@ -382,13 +513,24 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 	}
 
 	private void prepareOptionItem() {
-		// Clearing items
-		mOptionItems.clear();
-		// Preparing option items
-		mOptionItems.add(new OptionItem(TAG_PORTFOLIO, R.drawable.ic_tag, R.string.tag_portfolio));
-		if (!mEditEnabled) {
-			mOptionItems.add(new OptionItem(EDIT_PORTFOLIO, R.drawable.ic_edit, R.string.edit_portfolio));
-		}
+//		// Clearing items
+//		mOptionItems.clear();
+//		// Preparing option items
+//		mOptionItems.add(new OptionItem(MODIFY_PORTFOLIO, R.drawable.ic_edit, R.string.edit, OptionItem.VISIBLE));
+
+//		if (!mEditEnabled) {
+//			mOptionItems.add(new OptionItem(EDIT_PORTFOLIO, R.drawable.ic_filter, R.string.edit_portfolio,
+//					OptionItem.VISIBLE));
+//		}
+//		mOptionItems.add(new OptionItem(TRASH_PORTFOLIO, R.drawable.ic_trash, R.string.trash_portfolio,
+//				OptionItem.INVISIBLE));
+//		mOptionItems.add(new OptionItem(EXPORT_PORTFOLIO, R.drawable.ic_export, R.string.export_portfolio,
+//				OptionItem.INVISIBLE));
+//		mOptionItems.add(new OptionItem(SHARE_PORTFOLIO, R.drawable.ic_share, R.string.share_portfolio,
+//				OptionItem.INVISIBLE));
+//		mOptionItems
+//				.add(new OptionItem(TAG_PORTFOLIO, R.drawable.ic_tag, R.string.tag_portfolio, OptionItem.INVISIBLE));
+
 		// Refreshing options menu
 		getSherlockActivity().invalidateOptionsMenu();
 	}
@@ -398,23 +540,26 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 		mAdapter = new CategoryArrayAdapter(mCategories);
 	}
 
-//	private class PortfolioAsyncTask extends SCAsyncTask<Void, Void, Portfolio> {
-//
-//		public PortfolioAsyncTask() {
-//			super(getSherlockActivity(), new AbstractAsyncTaskProcessor<Void, Portfolio>(getSherlockActivity()) {
-//				@Override
-//				public Portfolio performAction(Void... params) throws SecurityException, Exception {
-//					return PMHelper.getPortfolio(mSharedPortfolio.getPortfolioEntityId());
-//				}
-//
-//				@Override
-//				public void handleResult(Portfolio result) {
-//					prepareView(result);
-//				}
-//			});
-//		}
-//	}
-//
+	// private class PortfolioAsyncTask extends SCAsyncTask<Void, Void,
+	// Portfolio> {
+	//
+	// public PortfolioAsyncTask() {
+	// super(getSherlockActivity(), new AbstractAsyncTaskProcessor<Void,
+	// Portfolio>(getSherlockActivity()) {
+	// @Override
+	// public Portfolio performAction(Void... params) throws SecurityException,
+	// Exception {
+	// return PMHelper.getPortfolio(mSharedPortfolio.getPortfolioEntityId());
+	// }
+	//
+	// @Override
+	// public void handleResult(Portfolio result) {
+	// prepareView(result);
+	// }
+	// });
+	// }
+	// }
+	//
 	/*
 	 * private class PortfolioTask extends AsyncTask<Void, Void, Portfolio> {
 	 * 
@@ -463,81 +608,83 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 	 * 
 	 * }
 	 */
-//	private class CategoryAsyncTask extends SCAsyncTask<Void, Void, List<CategoryItem>> {
-//
-//		public CategoryAsyncTask() {
-//			super(getSherlockActivity(),
-//					new AbstractAsyncTaskProcessor<Void, List<CategoryItem>>(getSherlockActivity()) {
-//						@Override
-//						public List<CategoryItem> performAction(Void... params) throws SecurityException, Exception {
-//							return prepareCategories();
-//						}
-//
-//						@Override
-//						public void handleResult(List<CategoryItem> result) {
-//							// Clearing old list
-//							mCategories.clear();
-//							// Adding result
-//							if (result != null) {
-//								mCategories.addAll(result);
-//							}
-//							// Notifying adapter
-//							mAdapter.notifyDataSetChanged();
-//						}
-//					});
-//		}
-//	}
+	// private class CategoryAsyncTask extends SCAsyncTask<Void, Void,
+	// List<CategoryItem>> {
+	//
+	// public CategoryAsyncTask() {
+	// super(getSherlockActivity(),
+	// new AbstractAsyncTaskProcessor<Void,
+	// List<CategoryItem>>(getSherlockActivity()) {
+	// @Override
+	// public List<CategoryItem> performAction(Void... params) throws
+	// SecurityException, Exception {
+	// return prepareCategories();
+	// }
+	//
+	// @Override
+	// public void handleResult(List<CategoryItem> result) {
+	// // Clearing old list
+	// mCategories.clear();
+	// // Adding result
+	// if (result != null) {
+	// mCategories.addAll(result);
+	// }
+	// // Notifying adapter
+	// mAdapter.notifyDataSetChanged();
+	// }
+	// });
+	// }
+	// }
 
 	private static class Data {
 		List<CategoryItem> items;
 		Portfolio portfolio;
 		boolean initView;
 	}
-	
+
 	private class LoadAsyncTask extends SCAsyncTask<Boolean, Void, Data> {
 
 		public LoadAsyncTask() {
-			super(getSherlockActivity(),
-					new AbstractAsyncTaskProcessor<Boolean, Data>(getSherlockActivity()) {
-						@Override
-						public Data performAction(Boolean... params) throws SecurityException, Exception {
-							Data data = new Data();
-							if (params != null && params.length > 0 && params[0] != null && params[0]) {
-								data.initView = true;
-							} else {
-								data.initView = false;
-							}
-							if (data.initView) {
-								if (mSharedPortfolio.isOwned())
-									data.portfolio = PMHelper.getPortfolio(mSharedPortfolio.getPortfolioEntityId());
-								else 
-									data.portfolio = mSharedPortfolio.getContainer().getPortfolio();
-							} else {
-								data.portfolio = mPortfolio;
-							}
-						
-							if (mSharedPortfolio.isOwned()) 
-								data.items = prepareCategories(PMHelper.getUserProducedDataList());
-							else 
-								data.items = prepareCategories(mSharedPortfolio.getContainer().getSharedProducedDatas());
-							return data;
-						}
+			super(getSherlockActivity(), new AbstractAsyncTaskProcessor<Boolean, Data>(getSherlockActivity()) {
+				@Override
+				public Data performAction(Boolean... params) throws SecurityException, Exception {
+					Data data = new Data();
+					if (params != null && params.length > 0 && params[0] != null && params[0]) {
+						data.initView = true;
+					} else {
+						data.initView = false;
+					}
+					if (data.initView) {
+						if (mSharedPortfolio.isOwned())
+							data.portfolio = PMHelper.getPortfolio(mSharedPortfolio.getPortfolioEntityId());
+						else
+							data.portfolio = mSharedPortfolio.getContainer().getPortfolio();
+					} else {
+						data.portfolio = mPortfolio;
+					}
 
-						@Override
-						public void handleResult(Data result) {
-							if (result.initView) {
-								prepareView(result.portfolio);
-							}
-							// Clearing old list
-							mCategories.clear();
-							// Adding result
-							if (result.items != null) {
-								mCategories.addAll(result.items);
-							}
-							// Notifying adapter
-							mAdapter.notifyDataSetChanged();
-						}
-					});
+					if (mSharedPortfolio.isOwned())
+						data.items = prepareCategories(PMHelper.getUserProducedDataList());
+					else
+						data.items = prepareCategories(mSharedPortfolio.getContainer().getSharedProducedDatas());
+					return data;
+				}
+
+				@Override
+				public void handleResult(Data result) {
+					if (result.initView) {
+						prepareView(result.portfolio);
+					}
+					// Clearing old list
+					mCategories.clear();
+					// Adding result
+					if (result.items != null) {
+						mCategories.addAll(result.items);
+					}
+					// Notifying adapter
+					mAdapter.notifyDataSetChanged();
+				}
+			});
 		}
 	}
 
@@ -640,7 +787,7 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 				convertView.setTag(holder);
 			} else {
 				holder = (Holder) convertView.getTag();
-			}	
+			}
 			// Retrieving category
 			final CategoryItem item = getItem(position);
 			// Preparing label and ImageView
@@ -744,11 +891,11 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 		// Exit from edit mode
 		prepareOptionItem();
 		// Starting new task for categories
-//		if (mCategoryTask != null && !mCategoryTask.isCancelled()) {
-//			mCategoryTask.cancel(true);
-//		}
-//		mCategoryTask = new CategoryAsyncTask();
-//		mCategoryTask.execute();
+		// if (mCategoryTask != null && !mCategoryTask.isCancelled()) {
+		// mCategoryTask.cancel(true);
+		// }
+		// mCategoryTask = new CategoryAsyncTask();
+		// mCategoryTask.execute();
 		mLoadTask = new LoadAsyncTask();
 		mLoadTask.execute(false);
 	}
@@ -763,13 +910,12 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 
 	}
 
-	private class SaveTaskProcessor  extends AbstractAsyncTaskProcessor<Void, Void>{
+	private class SaveTaskProcessor extends AbstractAsyncTaskProcessor<Void, Void> {
 
 		public SaveTaskProcessor(Activity activity) {
 			super(activity);
 		}
 
-		
 		@Override
 		public Void performAction(Void... params) throws SecurityException, Exception {
 			PMHelper.savePortfolioData(mPortfolio, mUpdatedElements);
@@ -786,8 +932,8 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 	@Override
 	public List<SemanticSuggestion> getTags(CharSequence text) {
 		try {
-			return SuggestionHelper.getSuggestions(text, getActivity(), Preferences.getHost(getActivity()), PMHelper.getAuthToken(),
-					Preferences.getAppToken());
+			return SuggestionHelper.getSuggestions(text, getActivity(), Preferences.getHost(getActivity()),
+					PMHelper.getAuthToken(), Preferences.getAppToken());
 		} catch (Exception e) {
 			return Collections.emptyList();
 		}
@@ -800,14 +946,12 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 		new TaggingAsyncTask().execute(list);
 	}
 
-	private List<CategoryItem> prepareCategories(List<UserProducedData> updList)
-			throws NameNotFoundException, DataException, ConnectionException,
-			ProtocolException, SecurityException {
+	private List<CategoryItem> prepareCategories(List<UserProducedData> updList) throws NameNotFoundException,
+			DataException, ConnectionException, ProtocolException, SecurityException {
 		// Retrieving arrays
 		if (mCategoriesLabels == null) {
 			mCategoriesLabels = getResources().getStringArray(R.array.portfolio_categories_labels);
-			mCategoriesOrdered = getResources()
-					.getStringArray(R.array.portfolio_categories_ordered);
+			mCategoriesOrdered = getResources().getStringArray(R.array.portfolio_categories_ordered);
 			mForceVisualization = getResources().getStringArray(R.array.portfolio_categories_shown);
 		}
 		// We assert that two lengths are the same because
@@ -848,8 +992,7 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 					item.isEmpty = cherries.isEmpty();
 					item.isShown = !cherries.isEmpty();
 				} else {
-					accept = mUpdatedElements.contains(item.category) ? cherries.isEmpty()
-							: !cherries.isEmpty();
+					accept = mUpdatedElements.contains(item.category) ? cherries.isEmpty() : !cherries.isEmpty();
 					item.isShown = !cherries.isEmpty();
 					item.isEmpty = cherries.isEmpty();
 				}
@@ -920,11 +1063,11 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 			// mTagTask = new TagTask();
 			// mTagTask.execute();
 			// Starting new task for categories
-//			if (mCategoryTask != null && !mCategoryTask.isCancelled()) {
-//				mCategoryTask.cancel(true);
-//			}
-//			mCategoryTask = new CategoryAsyncTask();
-//			mCategoryTask.execute();
+			// if (mCategoryTask != null && !mCategoryTask.isCancelled()) {
+			// mCategoryTask.cancel(true);
+			// }
+			// mCategoryTask = new CategoryAsyncTask();
+			// mCategoryTask.execute();
 
 		} else {
 			mTagsTextView.setText(null);
@@ -949,6 +1092,88 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 					mTagsTextView.setText(result);
 				}
 			});
+		}
+	}
+
+	private class PortfolioExportAsyncTask extends AsyncTask<String, Void, byte[]> {
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			// Showing progress bar
+			showProgressBar(true);
+		}
+
+		protected byte[] doInBackground(String... params) {
+			try {
+				return PMHelper.exportPortfolio(params[0]);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(this.getClass().getSimpleName(), "Exception getting portfolio export from server");
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(byte[] result) {
+			// Hiding progress bar
+			showProgressBar(false);
+			if (result != null) {
+				File saving = new File(getActivity().getExternalFilesDir(null), "portfolio.pdf");
+				FileOutputStream fout;
+				try {
+					fout = new FileOutputStream(saving);
+					fout.write(result);
+					fout.flush();
+					fout.close();
+				} catch (FileNotFoundException e) {
+					Log.e(this.getClass().getSimpleName(), saving.getAbsolutePath() + " not found");
+					ToastBuilder.showShort(getActivity(), "An error occurred exporting portfolio");
+				} catch (IOException e) {
+					Log.e(this.getClass().getSimpleName(), saving.getAbsolutePath() + " cannot be open");
+					ToastBuilder.showShort(getActivity(), "An error occurred exporting portfolio");
+				}
+
+				Intent pdfIntent = new Intent(Intent.ACTION_VIEW);
+				pdfIntent.setDataAndType(Uri.fromFile(saving), "application/pdf");
+				pdfIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				try {
+					startActivity(pdfIntent);
+				} catch (ActivityNotFoundException e) {
+					ToastBuilder.showShort(getActivity(),
+							"You have to install a pdf reader app to export the portfolio");
+				}
+			} else {
+				ToastBuilder.showShort(getActivity(), "An error occurred exporting portfolio");
+			}
+
+		}
+
+		private void showProgressBar(boolean show) {
+			getSherlockActivity().setSupportProgressBarIndeterminateVisibility(show);
+		}
+
+	}
+
+	private class RemoveTaskProcessor extends AbstractAsyncTaskProcessor<Portfolio, List<Portfolio>> {
+
+		public RemoveTaskProcessor(Activity activity) {
+			super(activity);
+		}
+
+		@Override
+		public List<Portfolio> performAction(Portfolio... params) throws SecurityException, Exception {
+			PMHelper.removePortfolio(params[0]);
+			return PMHelper.getPortfolioList();
+		}
+
+		@Override
+		public void handleResult(List<Portfolio> result) {
+			if (result != null) {
+				getSherlockActivity().getSupportFragmentManager().popBackStack();
+			} else
+				Toast.makeText(getSherlockActivity(), R.string.problem_delete_portfolio, Toast.LENGTH_LONG).show();
+
 		}
 	}
 

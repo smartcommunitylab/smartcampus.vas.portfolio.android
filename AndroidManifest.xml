@@ -55,13 +55,11 @@
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_home"
             android:launchMode="singleTask" >
+<!--             <intent-filter> -->
+<!--                 <action android:name="android.intent.action.MAIN" /> -->
 
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-
-
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
+<!--                 <category android:name="android.intent.category.LAUNCHER" /> -->
+<!--             </intent-filter> -->
             <intent-filter>
                 <action android:name="eu.trentorise.smartcampus.START" />
 
@@ -73,6 +71,14 @@
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data android:scheme="eu.trentorise.smartcampus.portfolio" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.github.espiandev.showcaseview.TutorialActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden|keyboard"
+            android:theme="@style/TutorialTheme" >
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity

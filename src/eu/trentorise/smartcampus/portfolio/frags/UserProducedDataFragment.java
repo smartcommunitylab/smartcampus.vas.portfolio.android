@@ -74,6 +74,7 @@ public class UserProducedDataFragment extends SherlockListFragment implements On
 	private static final String CHERRY_ITEMS = "CHERRY_ITEMS";
 
 	private static final int EDIT_USER_PRODUCED_DATA = 15;
+	private static final int MODIFY_PORTFOLIO = 16;
 
 	// UI References
 	private View mFooter;
@@ -177,6 +178,9 @@ public class UserProducedDataFragment extends SherlockListFragment implements On
 		switch (item.getItemId()) {
 		case EDIT_USER_PRODUCED_DATA:
 			setEditMode(true);
+			return true;
+		case MODIFY_PORTFOLIO:
+			PMHelper.openPortfolioInBrowser(getSherlockActivity());
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -305,9 +309,13 @@ public class UserProducedDataFragment extends SherlockListFragment implements On
 	private void prepareOptionItem() {
 		// Clearing items
 		mOptionItems.clear();
+
 		if (!mEditEnabled) {
-			mOptionItems.add(new OptionItem(EDIT_USER_PRODUCED_DATA, R.drawable.ic_edit, R.string.edit));
+			mOptionItems.add(new OptionItem(EDIT_USER_PRODUCED_DATA, R.drawable.ic_filter, R.string.edit,OptionItem.VISIBLE));
+			mOptionItems.add(new OptionItem(MODIFY_PORTFOLIO, R.drawable.ic_edit, R.string.edit,OptionItem.VISIBLE));
+
 		}
+
 		// Refreshing options menu
 		getSherlockActivity().invalidateOptionsMenu();
 	}

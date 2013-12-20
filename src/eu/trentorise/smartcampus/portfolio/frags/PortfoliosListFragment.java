@@ -42,7 +42,6 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -51,6 +50,7 @@ import com.actionbarsherlock.app.SherlockListFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.github.espiandev.showcaseview.TutorialHelper;
 
 import eu.trentorise.smartcampus.android.common.SCAsyncTask;
 import eu.trentorise.smartcampus.android.common.tagging.SemanticSuggestion;
@@ -76,22 +76,23 @@ import eu.trentorise.smartcampus.protocolcarrier.exceptions.SecurityException;
  * @author Simone Casagranda
  * 
  */
-public class PortfoliosListFragment extends SherlockListFragment implements
-		TaggingDialog.TagProvider {
+public class PortfoliosListFragment extends SherlockListFragment implements TaggingDialog.TagProvider {
 
 	// private static final String TAG_DIALOG_PORTFOLIO_CREATE =
 	// "dialog-portfolio-create";
 
 	private static final int CREATE_NEW_PORTFOLIO = 13;
+	private static final int MODIFY_PORTFOLIO = 16;
+	private static final int TUTORIAL_PORTFOLIO = 12;
+	public static final String TUTORIAL_HELPER = "tutorial helper";
 
-	private List<Portfolio> mPortfolios = new ArrayList<Portfolio>();
-
+	private  List<Portfolio> mPortfolios = new ArrayList<Portfolio>();
 	private FragmentLoader mFragmentLoader;
 	private NoteLayerInteractor mNoteLayerInteractor;
-
 	private PorfolioAdapter mArrayAdapter;
 
 	private PortfolioListAsyncTask mPortfolioAsyncTask;
+	private TutorialHelper mTutorialHelper = null;
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -99,14 +100,12 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 		if (activity instanceof FragmentLoader) {
 			mFragmentLoader = (FragmentLoader) activity;
 		} else {
-			throw new RuntimeException(
-					"The container Activity has to be an instance of FragmentLoader");
+			throw new RuntimeException("The container Activity has to be an instance of FragmentLoader");
 		}
 		if (activity instanceof NoteLayerInteractor) {
 			mNoteLayerInteractor = (NoteLayerInteractor) activity;
 		} else {
-			throw new RuntimeException(
-					"The container Activity has to be an instance of NoteLayerInteractor");
+			throw new RuntimeException("The container Activity has to be an instance of NoteLayerInteractor");
 		}
 		if (activity instanceof SharedPortfolio) {
 			assert ((SharedPortfolio) activity).isOwned();
@@ -118,19 +117,24 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
+		mTutorialHelper = getArguments().getParcelable(TUTORIAL_HELPER);
 	}
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		menu.add(Menu.NONE, CREATE_NEW_PORTFOLIO, Menu.NONE,
-				R.string.new_portfolio).setIcon(R.drawable.ic_add)
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		 inflater.inflate(R.menu.fragmentlist_menu, menu);
+//		menu.add(Menu.NONE, R.id.modify_portfolio, Menu.NONE, R.string.edit).setIcon(R.drawable.ic_edit)
+//				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+//		menu.add(Menu.NONE, R.id.create_portfolio, Menu.NONE, R.string.new_portfolio).setIcon(R.drawable.ic_add)
+//				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+//		menu.add(Menu.NONE, R.id.tutorial_portfolio, Menu.NONE, R.string.tutorial_portfolio)
+//				.setIcon(R.drawable.ic_tutorial).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case CREATE_NEW_PORTFOLIO:
+		case R.id.create_portfolio:
 			// Un comment if you want to use a fragment instead of an Activity
 			//
 			// // Searching old dialog instance
@@ -145,18 +149,52 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 			// // Creating and showing dialog.
 			// DialogFragment newFragment = new CreatePortfolioFragment();
 			// newFragment.show(ft, TAG_DIALOG_PORTFOLIO_CREATE);
-			Intent intent = new Intent(getActivity(),
-					CreatePortfolioDialog.class);
+			Intent intent = new Intent(getActivity(), CreatePortfolioDialog.class);
 			startActivity(intent);
+			return true;
+		case R.id.modify_portfolio:
+			PMHelper.openPortfolioInBrowser(getSherlockActivity());
+			return true;
+		case R.id.tutorial_portfolio:
+			if (mTutorialHelper != null)
+				mTutorialHelper.showTutorials();
+			return true;
+		case R.id.refresh_portfolios:
+			refreshPortfolios();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 	}
 
+	private void refreshPortfolios() {
+		new PortfolioRefreshAsyncTask().execute();
+		
+	}
+	private class PortfolioRefreshAsyncTask extends SCAsyncTask<Void, Void, List<Portfolio>> {
+
+		public PortfolioRefreshAsyncTask() {
+			super(getSherlockActivity(), new AbstractAsyncTaskProcessor<Void, List<Portfolio>>(getSherlockActivity()) {
+				@Override
+				public List<Portfolio> performAction(Void... params) throws SecurityException, Exception {
+					PMHelper.removeAllPortfolios();
+					return PMHelper.getPortfolioList();
+				}
+
+				@Override
+				public void handleResult(List<Portfolio> result) {
+					if (result != null) {
+						//clear data e find if there is the same portfolio
+						mPortfolios = result;
+						
+					}
+
+				}
+			});
+		}
+	}
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// Inflating layout into fragment
 		View v = inflater.inflate(R.layout.listfrag_portfolios, null);
 		return v;
@@ -169,7 +207,6 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 		mArrayAdapter = new PorfolioAdapter(getActivity(), mPortfolios);
 		// Setting adapter to ListView
 		getListView().setAdapter(mArrayAdapter);
-		getListView().setOnItemLongClickListener(mArrayAdapter);
 		getListView().setOnItemClickListener(mArrayAdapter);
 		getListView().setOnScrollListener(mArrayAdapter);
 	}
@@ -179,10 +216,8 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 		super.onResume();
 		// Showing/hiding back button
 		getSherlockActivity().getSupportActionBar().setHomeButtonEnabled(false);
-		getSherlockActivity().getSupportActionBar().setDisplayHomeAsUpEnabled(
-				false);
-		getSherlockActivity().getSupportActionBar().setTitle(
-				R.string.my_portfolios);
+		getSherlockActivity().getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+		getSherlockActivity().getSupportActionBar().setTitle(R.string.my_portfolios);
 		// Showing note layer
 		mNoteLayerInteractor.setVisibility(true);
 		// Updating data
@@ -198,38 +233,33 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 		}
 	}
 
-	private class PortfolioListAsyncTask extends
-			SCAsyncTask<Void, Void, List<Portfolio>> {
+	private class PortfolioListAsyncTask extends SCAsyncTask<Void, Void, List<Portfolio>> {
 
 		public PortfolioListAsyncTask() {
-			super(getSherlockActivity(),
-					new AbstractAsyncTaskProcessor<Void, List<Portfolio>>(
-							getSherlockActivity()) {
-						@Override
-						public List<Portfolio> performAction(Void... params)
-								throws SecurityException, Exception {
-							return PMHelper.getPortfolioList();
-						}
+			super(getSherlockActivity(), new AbstractAsyncTaskProcessor<Void, List<Portfolio>>(getSherlockActivity()) {
+				@Override
+				public List<Portfolio> performAction(Void... params) throws SecurityException, Exception {
+					return PMHelper.getPortfolioList();
+				}
 
-						@Override
-						public void handleResult(List<Portfolio> result) {
-							if (result != null) {
-								// Clearing old data
-								mPortfolios.clear();
-								// Adding new data
-								mPortfolios.addAll(result);
-								// Notifying adapter about new elements
-								mArrayAdapter.notifyDataSetChanged();
-							}
-							
-							WelcomeDlgHelper.welcome(getSherlockActivity());
-						}
-					});
+				@Override
+				public void handleResult(List<Portfolio> result) {
+					if (result != null) {
+						// Clearing old data
+						mPortfolios.clear();
+						// Adding new data
+						mPortfolios.addAll(result);
+						// Notifying adapter about new elements
+						mArrayAdapter.notifyDataSetChanged();
+					}
+
+					WelcomeDlgHelper.welcome(getSherlockActivity());
+				}
+			});
 		}
 	}
 
-	private class PortfolioExportAsyncTask extends
-			AsyncTask<String, Void, byte[]> {
+	private class PortfolioExportAsyncTask extends AsyncTask<String, Void, byte[]> {
 
 		@Override
 		protected void onPreExecute() {
@@ -243,8 +273,7 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 				return PMHelper.exportPortfolio(params[0]);
 			} catch (Exception e) {
 				e.printStackTrace();
-				Log.e(this.getClass().getSimpleName(),
-						"Exception getting portfolio export from server");
+				Log.e(this.getClass().getSimpleName(), "Exception getting portfolio export from server");
 			}
 			return null;
 		}
@@ -254,8 +283,7 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 			// Hiding progress bar
 			showProgressBar(false);
 			if (result != null) {
-				File saving = new File(getActivity().getExternalFilesDir(null),
-						"portfolio.pdf");
+				File saving = new File(getActivity().getExternalFilesDir(null), "portfolio.pdf");
 				FileOutputStream fout;
 				try {
 					fout = new FileOutputStream(saving);
@@ -263,27 +291,21 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 					fout.flush();
 					fout.close();
 				} catch (FileNotFoundException e) {
-					Log.e(this.getClass().getSimpleName(),
-							saving.getAbsolutePath() + " not found");
-					ToastBuilder.showShort(getActivity(),
-							"An error occurred exporting portfolio");
+					Log.e(this.getClass().getSimpleName(), saving.getAbsolutePath() + " not found");
+					ToastBuilder.showShort(getActivity(), "An error occurred exporting portfolio");
 				} catch (IOException e) {
-					Log.e(this.getClass().getSimpleName(),
-							saving.getAbsolutePath() + " cannot be open");
-					ToastBuilder.showShort(getActivity(),
-							"An error occurred exporting portfolio");
+					Log.e(this.getClass().getSimpleName(), saving.getAbsolutePath() + " cannot be open");
+					ToastBuilder.showShort(getActivity(), "An error occurred exporting portfolio");
 				}
 
 				Intent pdfIntent = new Intent(Intent.ACTION_VIEW);
-				pdfIntent.setDataAndType(Uri.fromFile(saving),
-						"application/pdf");
+				pdfIntent.setDataAndType(Uri.fromFile(saving), "application/pdf");
 				pdfIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				try {
 					startActivity(pdfIntent);
 				} catch (ActivityNotFoundException e) {
-					ToastBuilder
-							.showShort(getActivity(),
-									"You have to install a pdf reader app to export the portfolio");
+					ToastBuilder.showShort(getActivity(),
+							"You have to install a pdf reader app to export the portfolio");
 				}
 			} else {
 				ToastBuilder.showShort(getActivity(), "An error occurred exporting portfolio");
@@ -292,21 +314,17 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 		}
 
 		private void showProgressBar(boolean show) {
-			getSherlockActivity().setSupportProgressBarIndeterminateVisibility(
-					show);
+			getSherlockActivity().setSupportProgressBarIndeterminateVisibility(show);
 		}
 
 	}
 
-	private class PorfolioAdapter extends ArrayAdapter<Portfolio> implements
-			OnScrollListener, OnItemLongClickListener, OnItemClickListener {
-
+	private class PorfolioAdapter extends ArrayAdapter<Portfolio> implements OnScrollListener, OnItemClickListener {
 
 		private static final int NOT_VALID_POSITION = -1;
 
 		private int openedItem = NOT_VALID_POSITION;
 		private Context mContext;
-
 
 		public class Holder {
 			View visibleView, hiddenView;
@@ -317,7 +335,7 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 
 		public PorfolioAdapter(Context context, List<Portfolio> objects) {
 			super(context, R.layout.item_portfoliolist, objects);
-			mContext =context;
+			mContext = context;
 		}
 
 		@Override
@@ -325,27 +343,18 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 			Holder holder = null;
 			if (convertView == null) {
 				// Inflate View for ListItem
-				convertView = LayoutInflater.from(getActivity()).inflate(
-						R.layout.item_portfoliolist, null);
+				convertView = LayoutInflater.from(getActivity()).inflate(R.layout.item_portfoliolist, null);
 				// Create Holder
 				holder = new Holder();
 				// Find items in view
-				holder.portfolioNameTextView = (TextView) convertView
-						.findViewById(R.id.portfolio_name);
-				holder.visibleView = (View) convertView
-						.findViewById(R.id.visible_view);
-				holder.hiddenView = (View) convertView
-						.findViewById(R.id.hidden_view);
-				holder.trashButton = (ImageButton) convertView
-						.findViewById(R.id.trash);
-				holder.exportButton = (ImageButton) convertView
-						.findViewById(R.id.export);
-				holder.shareButton = (ImageButton) convertView
-						.findViewById(R.id.share);
-				holder.tagButton = (ImageButton) convertView
-						.findViewById(R.id.tag);
-				holder.editButton = (ImageButton) convertView
-						.findViewById(R.id.edit);
+				holder.portfolioNameTextView = (TextView) convertView.findViewById(R.id.portfolio_name);
+				holder.visibleView = (View) convertView.findViewById(R.id.visible_view);
+				holder.hiddenView = (View) convertView.findViewById(R.id.hidden_view);
+				holder.trashButton = (ImageButton) convertView.findViewById(R.id.trash);
+				holder.exportButton = (ImageButton) convertView.findViewById(R.id.export);
+				holder.shareButton = (ImageButton) convertView.findViewById(R.id.share);
+				holder.tagButton = (ImageButton) convertView.findViewById(R.id.tag);
+				holder.editButton = (ImageButton) convertView.findViewById(R.id.edit);
 				// add Holder to View
 				convertView.setTag(holder);
 			} else {
@@ -363,42 +372,38 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 					AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 					// Add the buttons
 					builder.setMessage(mContext.getString(R.string.sure_delete_portfolio));
-					builder.setPositiveButton(R.string.ok,
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int id) {
-									// User clicked OK button
-									// Removing portfolio
-									if (mPortfolioAsyncTask != null
-											&& !mPortfolioAsyncTask.isCancelled()) {
-										mPortfolioAsyncTask.cancel(true);
-									}
-									openedItem = NOT_VALID_POSITION;
-									new SCAsyncTask<Portfolio, Void, List<Portfolio>>(
-											PortfoliosListFragment.this.getSherlockActivity(),
-											new RemoveTaskProcessor(getSherlockActivity())).execute(p);
-								}
-							});
-					builder.setNegativeButton(R.string.cancel,
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int id) {
-									// User cancelled the dialog
-									dialog.dismiss();
-								}
-							});
+					builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							// User clicked OK button
+							// Removing portfolio
+							if (mPortfolioAsyncTask != null && !mPortfolioAsyncTask.isCancelled()) {
+								mPortfolioAsyncTask.cancel(true);
+							}
+							openedItem = NOT_VALID_POSITION;
+							new SCAsyncTask<Portfolio, Void, List<Portfolio>>(PortfoliosListFragment.this
+									.getSherlockActivity(), new RemoveTaskProcessor(getSherlockActivity())).execute(p);
+						}
+					});
+					builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							// User cancelled the dialog
+							dialog.dismiss();
+						}
+					});
 
 					// Create the AlertDialog
 					AlertDialog dialog = builder.create();
 					// remove the element from the array
 					dialog.show();
-					/*// Removing portfolio
-					if (mPortfolioAsyncTask != null
-							&& !mPortfolioAsyncTask.isCancelled()) {
-						mPortfolioAsyncTask.cancel(true);
-					}
-					openedItem = NOT_VALID_POSITION;
-					new SCAsyncTask<Portfolio, Void, List<Portfolio>>(
-							PortfoliosListFragment.this.getSherlockActivity(),
-							new RemoveTaskProcessor(getSherlockActivity())).execute(p);*/
+					/*
+					 * // Removing portfolio if (mPortfolioAsyncTask != null &&
+					 * !mPortfolioAsyncTask.isCancelled()) {
+					 * mPortfolioAsyncTask.cancel(true); } openedItem =
+					 * NOT_VALID_POSITION; new SCAsyncTask<Portfolio, Void,
+					 * List<Portfolio>>(
+					 * PortfoliosListFragment.this.getSherlockActivity(), new
+					 * RemoveTaskProcessor(getSherlockActivity())).execute(p);
+					 */
 				}
 			});
 
@@ -417,19 +422,15 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 			holder.tagButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					TaggingDialog taggingDialog = new TaggingDialog(
-							getActivity(),
+					TaggingDialog taggingDialog = new TaggingDialog(getActivity(),
 							new TaggingDialog.OnTagsSelectedListener() {
 
 								@SuppressWarnings("unchecked")
 								@Override
-								public void onTagsSelected(
-										Collection<SemanticSuggestion> suggestions) {
-									new TaggingAsyncTask(p).execute(Concept
-											.convertSS(suggestions));
+								public void onTagsSelected(Collection<SemanticSuggestion> suggestions) {
+									new TaggingAsyncTask(p).execute(Concept.convertSS(suggestions));
 								}
-							}, PortfoliosListFragment.this, Concept
-									.convertToSS(p.tags));
+							}, PortfoliosListFragment.this, Concept.convertToSS(p.tags));
 					taggingDialog.show();
 					// mFragmentLoader.load(AddTagFragment.class, true,
 					// AddTagFragment.prepareArguments(p));
@@ -439,8 +440,7 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 				@Override
 				public void onClick(View v) {
 					// Loading edit portfolio fragment
-					mFragmentLoader.load(PortfolioFragment.class, true,
-							PortfolioFragment.prepareArguments(p, true));
+					mFragmentLoader.load(PortfolioFragment.class, true, PortfolioFragment.prepareArguments(p, true));
 				}
 			});
 			// Hiding visible view if it's the one hidden at position n
@@ -467,24 +467,22 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 		public void onItemClick(AdapterView<?> parent, View v, int pos, long id) {
 			// Loading next fragment
 			Portfolio p = mArrayAdapter.getItem(pos);
-			mFragmentLoader.load(PortfolioFragment.class, true,
-					PortfolioFragment.prepareArguments(p, false));
+			mFragmentLoader.load(PortfolioFragment.class, true, PortfolioFragment.prepareArguments(p, false));
 		}
 
-		@Override
-		public boolean onItemLongClick(AdapterView<?> parent, View v, int pos,
-				long id) {
-			if (pos != openedItem) {
-				// Updating item selected position
-				openedItem = pos;
-				notifyDataSetChanged();
-			}
-			return true;
-		}
+		// @Override
+		// public boolean onItemLongClick(AdapterView<?> parent, View v, int
+		// pos, long id) {
+		// if (pos != openedItem) {
+		// // Updating item selected position
+		// openedItem = pos;
+		// notifyDataSetChanged();
+		// }
+		// return true;
+		// }
 
 		@Override
-		public void onScroll(AbsListView view, int firstVisibleItem,
-				int visibleItemCount, int totalItemCount) {
+		public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 		}
 
 		@Override
@@ -496,18 +494,15 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 		}
 	}
 
-	private class RemoveTaskProcessor extends AbstractAsyncTaskProcessor<Portfolio, List<Portfolio>>  {
+	private class RemoveTaskProcessor extends AbstractAsyncTaskProcessor<Portfolio, List<Portfolio>> {
 
 		public RemoveTaskProcessor(Activity activity) {
 			super(activity);
 		}
 
-		
-
 		@Override
-		public List<Portfolio> performAction(Portfolio... params)
-				throws SecurityException, Exception {
-			PMHelper.removePortfolio(params[0]);
+		public List<Portfolio> performAction(Portfolio... params) throws SecurityException, Exception {
+			PMHelper.removePortfolioFromList(params[0]);
 			return PMHelper.getPortfolioList();
 		}
 
@@ -525,35 +520,29 @@ public class PortfoliosListFragment extends SherlockListFragment implements
 	@Override
 	public List<SemanticSuggestion> getTags(CharSequence text) {
 		try {
-			return SuggestionHelper.getSuggestions(text, getActivity(),
-					Preferences.getHost(getActivity()), PMHelper.getAuthToken(),
-					Preferences.getAppToken());
+			return SuggestionHelper.getSuggestions(text, getActivity(), Preferences.getHost(getActivity()),
+					PMHelper.getAuthToken(), Preferences.getAppToken());
 		} catch (Exception e) {
 			return Collections.emptyList();
 		}
 	}
 
-	private class TaggingAsyncTask extends
-			SCAsyncTask<List<Concept>, Void, Void> {
+	private class TaggingAsyncTask extends SCAsyncTask<List<Concept>, Void, Void> {
 
 		public TaggingAsyncTask(final Portfolio p) {
-			super(getSherlockActivity(),
-					new AbstractAsyncTaskProcessor<List<Concept>, Void>(
-							getSherlockActivity()) {
-						@Override
-						public Void performAction(List<Concept>... params)
-								throws SecurityException, Exception {
-							PMHelper.saveTags(p, params[0]);
-							p.tags = params[0];
-							return null;
-						}
+			super(getSherlockActivity(), new AbstractAsyncTaskProcessor<List<Concept>, Void>(getSherlockActivity()) {
+				@Override
+				public Void performAction(List<Concept>... params) throws SecurityException, Exception {
+					PMHelper.saveTags(p, params[0]);
+					p.tags = params[0];
+					return null;
+				}
 
-						@Override
-						public void handleResult(Void result) {
-							ToastBuilder.showShort(getActivity(),
-									R.string.tags_successfully_added);
-						}
-					});
+				@Override
+				public void handleResult(Void result) {
+					ToastBuilder.showShort(getActivity(), R.string.tags_successfully_added);
+				}
+			});
 		}
 	}
 

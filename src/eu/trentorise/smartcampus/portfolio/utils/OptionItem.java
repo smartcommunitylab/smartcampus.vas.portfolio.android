@@ -20,28 +20,33 @@ import android.os.Parcelable;
 
 /**
  * 
- * Class that allows you to store and retrieve option item in option menu.
- * It gives a good support if you use OptionItem list in bundles.
+ * Class that allows you to store and retrieve option item in option menu. It
+ * gives a good support if you use OptionItem list in bundles.
  * 
  * @author Simone Casagranda
- *
+ * 
  */
-public class OptionItem implements Parcelable{
-	
+public class OptionItem implements Parcelable {
+	public static final int VISIBLE = 1;
+	public static final int INVISIBLE = 0;
 	public int id;
 	public int icon;
 	public int res;
-	
-	public OptionItem(int id, int icon, int res) {
+	public int visible;
+
+	public OptionItem(int id, int icon, int res, int visible) {
 		this.id = id;
 		this.res = res;
 		this.icon = icon;
+		this.visible = visible;
+
 	}
-	
-	public OptionItem(Parcel in){
+
+	public OptionItem(Parcel in) {
 		id = in.readInt();
 		icon = in.readInt();
 		res = in.readInt();
+		visible = in.readInt();
 	}
 
 	@Override
@@ -54,5 +59,15 @@ public class OptionItem implements Parcelable{
 		dest.writeInt(id);
 		dest.writeInt(icon);
 		dest.writeInt(res);
+		dest.writeInt(visible);
+
+	}
+
+	public boolean getVisible() {
+		if (visible == 0) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 }

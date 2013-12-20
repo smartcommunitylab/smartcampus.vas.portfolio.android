@@ -283,7 +283,7 @@ public class CherryFragment extends SherlockListFragment implements OnBackPresse
 		// Clearing items
 		mOptionItems.clear();
 		if (!mEditEnabled) {
-			mOptionItems.add(new OptionItem(EDIT_CHERRIES_DATA, R.drawable.ic_edit, R.string.edit));
+			mOptionItems.add(new OptionItem(EDIT_CHERRIES_DATA, R.drawable.ic_filter, R.string.edit,OptionItem.VISIBLE));
 		}
 		// Refreshing options menu
 		getSherlockActivity().invalidateOptionsMenu();

@@ -75,6 +75,7 @@ public class PresentationFragment extends SherlockListFragment implements OnBack
 	private static final String UPDATED_ELEMS = "UPDATED_ELEMS";
 
 	private static final int EDIT_PRESENTATION = 15;
+	private static final int MODIFY_PORTFOLIO = 16;
 
 	// Interfaces and configurations
 	private ArrayList<OptionItem> mOptionItems = new ArrayList<OptionItem>();
@@ -169,6 +170,9 @@ public class PresentationFragment extends SherlockListFragment implements OnBack
 		switch (item.getItemId()) {
 		case EDIT_PRESENTATION:
 			setEditMode(true);
+			return true;
+		case MODIFY_PORTFOLIO:
+			PMHelper.openPortfolioInBrowser(getSherlockActivity());
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -275,10 +279,14 @@ public class PresentationFragment extends SherlockListFragment implements OnBack
 	private void prepareOptionItem() {
 		// Clearing items
 		mOptionItems.clear();
+
 		// Preparing option items
 		if (!mEditEnabled) {
-			mOptionItems.add(new OptionItem(EDIT_PRESENTATION, R.drawable.ic_edit, R.string.edit));
+			mOptionItems.add(new OptionItem(EDIT_PRESENTATION, R.drawable.ic_filter, R.string.edit,OptionItem.VISIBLE));
+			mOptionItems.add(new OptionItem(MODIFY_PORTFOLIO, R.drawable.ic_edit, R.string.edit,OptionItem.VISIBLE));
+
 		}
+
 		// Refreshing options menu
 		getSherlockActivity().invalidateOptionsMenu();
 	}

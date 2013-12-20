@@ -27,10 +27,15 @@
     <string name="object">Object</string>
     <string name="description">Description</string>
     <string name="new_portfolio">New CV</string>
+    <string name="tutorial_portfolio">Tutorial</string>
     <string name="role_in_prj">Role in the project</string>
     <string name="create">Create</string>
-    <string name="tag_portfolio">Tag CV</string>
-    <string name="edit_portfolio">Edit CV</string>
+    <string name="refresh_portfolio">Refresh</string>
+    <string name="trash_portfolio">Trash</string>
+    <string name="export_portfolio">Export</string>
+    <string name="share_portfolio">Share</string>
+    <string name="tag_portfolio">Tag</string>
+    <string name="edit_portfolio">Edit</string>
     <string name="cancel">Cancel</string>
     <string name="identity_info">Identity information</string>
     <string name="languages">Languages</string>
@@ -100,8 +105,11 @@
     <string name="cannot_find_portfolio">We are sorry to inform you that the selected CV cannot be opened.</string>
     <string name="portfolio_already_exist">This CV\'s name already exists</string>
     <string name="sure_delete_portfolio">Are you sure you want to delete the CV?</string>
+    <string name="problem_delete_portfolio">We had some problem to delete your CV</string>
+
     <!-- Portfolios -->
-    <string name="edit">Edit</string>
+    <string name="edit">Filter</string>
+    <string name="filter">Filter</string>
     <string name="app_failure_security">Failed to retrieve authentication data</string>
     <string name="app_failure_setup">Failed to initialize application</string>
     <string name="app_failure_operation">OOPS! An error occurred. Please check your connection or try again later</string>
@@ -109,7 +117,15 @@
     <string name="welcome_msg2">You will automagically find your notes on the MyCVs web application (https://vas.smartcampuslab.it/mycvs), from which you will be able to edit and customize your CVs.</string>
     <string name="welcome_msg_showagain">Don\'t show this again</string>
     <string name="notes_hint">Add here any notes about your CVs: you will find them again on the MyCVs web page.</string>
-
     <string name="token_required">Please login before proceeding with the application.</string>
-    
+    <string name="open_browser_title">Warning</string>
+    <string name="open_browser_message">You are leaving the app and entering in the Portfolio\'s website. Do you agree?</string>
+    <string name="open_browser_checkbox">Never show me again</string>
+    <!-- Tutorial -->
+    <string name="tut_title_modify">Modify</string>
+    <string name="tut_text_modify">Modify your personal information </string>
+    <string name="tut_title_create">Create</string>
+    <string name="tut_text_create">Create a new CV from your personal data, tap on one of your CVs to choose which info to show in it, export it, share it and so forth.
+        </string>
+
 </resources>

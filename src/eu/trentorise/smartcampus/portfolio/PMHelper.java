@@ -22,11 +22,20 @@ import java.util.HashSet;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.Toast;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import eu.trentorise.smartcampus.ac.AACException;
 import eu.trentorise.smartcampus.ac.SCAccessProvider;
 import eu.trentorise.smartcampus.android.common.AppHelper;
@@ -57,6 +66,9 @@ import eu.trentorise.smartcampus.storage.remote.RemoteStorage;
 
 public class PMHelper {
 
+	private static final String BROWSER_PREFS = "pm_browser_pref";
+	private static final String FIRST_LAUNCH_PREFS = "dt_firstLaunch";
+
 	private static AppConfigurations config = null;
 
 	private static Context mContext;
@@ -69,7 +81,7 @@ public class PMHelper {
 	// cached notes
 	private UserData userData = null;
 	// cached portfolios
-	private List<Portfolio> portfolioList = null;
+	private static List<Portfolio> portfolioList = null;
 	// cached student info
 	private StudentInfo studentInfo = null;
 	private Boolean hasStudentInfo = null;
@@ -80,7 +92,8 @@ public class PMHelper {
 	private List<UserProducedData> userProducedData;
 
 	public static final String ENTITY_TYPE_PORTFOLIO = "portfolio";
-	
+	private static boolean write_preferences = false;
+
 	protected PMHelper(Context mContext) {
 		super();
 		this.mContext = mContext;
@@ -150,8 +163,8 @@ public class PMHelper {
 
 	}
 
-	public static String getNotes() throws DataException, NameNotFoundException, ConnectionException, ProtocolException,
-			SecurityException, AACException {
+	public static String getNotes() throws DataException, NameNotFoundException, ConnectionException,
+			ProtocolException, SecurityException, AACException {
 		// if (getInstance().userData == null) {
 		Collection<UserData> list = getRemoteStorage().getObjects(UserData.class);
 		if (list != null && !list.isEmpty()) {
@@ -161,8 +174,8 @@ public class PMHelper {
 		return getInstance().userData.getNotes();
 	}
 
-	public static void createEmptyPortfolio(String name) throws NameNotFoundException, DataException, ConnectionException,
-			ProtocolException, SecurityException, AACException {
+	public static void createEmptyPortfolio(String name) throws NameNotFoundException, DataException,
+			ConnectionException, ProtocolException, SecurityException, AACException {
 		Portfolio p = new Portfolio();
 		p.timestamp = System.currentTimeMillis();
 		p.name = name;
@@ -210,8 +223,9 @@ public class PMHelper {
 		getRemoteStorage().update(mPortfolio, false);
 	}
 
-	public static void savePortfolioData(Portfolio mPortfolio, HashSet<String> mUpdatedElements) throws NameNotFoundException,
-			DataException, ConnectionException, ProtocolException, SecurityException, AACException {
+	public static void savePortfolioData(Portfolio mPortfolio, HashSet<String> mUpdatedElements)
+			throws NameNotFoundException, DataException, ConnectionException, ProtocolException, SecurityException,
+			AACException {
 		// mUpdatedElements contains categories
 		HashSet<String> idsHashSet = new HashSet<String>();
 		for (String category : mUpdatedElements) {
@@ -233,7 +247,8 @@ public class PMHelper {
 		// UPDataElements
 		mPortfolio.showUserGeneratedData = PMUtils.updateList(mPortfolio.showUserGeneratedData, mUpdatedUPDataElements);
 		// CherryElements
-		mPortfolio.highlightUserGeneratedData = PMUtils.updateList(mPortfolio.highlightUserGeneratedData, mCherryElements);
+		mPortfolio.highlightUserGeneratedData = PMUtils.updateList(mPortfolio.highlightUserGeneratedData,
+				mCherryElements);
 
 		getRemoteStorage().update(mPortfolio, false);
 	}
@@ -241,7 +256,8 @@ public class PMHelper {
 	public static void savePortfolioCherryData(Portfolio mPortfolio, HashSet<String> mCherryElements)
 			throws NameNotFoundException, DataException, ConnectionException, ProtocolException, SecurityException,
 			AACException {
-		mPortfolio.highlightUserGeneratedData = PMUtils.updateList(mPortfolio.highlightUserGeneratedData, mCherryElements);
+		mPortfolio.highlightUserGeneratedData = PMUtils.updateList(mPortfolio.highlightUserGeneratedData,
+				mCherryElements);
 		getRemoteStorage().update(mPortfolio, false);
 	}
 
@@ -286,8 +302,8 @@ public class PMHelper {
 		return getInstance().portfolioList;
 	}
 
-	public static void removePortfolio(Portfolio p) throws NameNotFoundException, DataException, ConnectionException,
-			ProtocolException, SecurityException, AACException {
+	public static void removePortfolioFromList(Portfolio p) throws NameNotFoundException, DataException,
+			ConnectionException, ProtocolException, SecurityException, AACException {
 		if (!config.isTestModeEnabled()) {
 			getRemoteStorage().delete(p.getId(), Portfolio.class);
 		}
@@ -298,6 +314,31 @@ public class PMHelper {
 				break;
 			}
 		}
+	}
+
+	public static boolean removePortfolio(Portfolio p) throws NameNotFoundException, DataException,
+			ConnectionException, ProtocolException, SecurityException, AACException {
+		if (!config.isTestModeEnabled()) {
+			getRemoteStorage().delete(p.getId(), Portfolio.class);
+			//delete from local
+			removeLocalPortfolio(p.getId());
+			return true;
+		}
+		return false;
+	}
+
+	private static void removeLocalPortfolio(String id) {
+		try {
+			for (Portfolio p:getInstance().portfolioList)
+			{
+				if (p.getId().equals(id))
+					getInstance().portfolioList.remove(p);
+			}
+		} catch (DataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 	public static Portfolio getPortfolio(String portfolioEntityId) throws NameNotFoundException, DataException,
@@ -328,6 +369,9 @@ public class PMHelper {
 		return p;
 	}
 
+	public static void removeAllPortfolios(){
+		portfolioList = null;
+	}
 	public static Boolean isOwnPortfolio(String portfolioEntityId) throws NameNotFoundException, DataException,
 			ConnectionException, ProtocolException, SecurityException, AACException {
 		if (portfolioEntityId == null)
@@ -368,10 +412,10 @@ public class PMHelper {
 		}
 	}
 
-	public static byte[] exportPortfolio(String portfolioId) throws ConnectionException, ProtocolException, SecurityException,
-			AACException {
-		MessageRequest request = new MessageRequest(Preferences.getHost(mContext), Preferences.getService() + "/generatecv/"
-				+ portfolioId + "/pdf/false");
+	public static byte[] exportPortfolio(String portfolioId) throws ConnectionException, ProtocolException,
+			SecurityException, AACException {
+		MessageRequest request = new MessageRequest(Preferences.getHost(mContext), Preferences.getService()
+				+ "/generatecv/" + portfolioId + "/pdf/false");
 		request.setMethod(Method.GET);
 		request.setRequestFile(true);
 		MessageResponse response = new ProtocolCarrier(mContext, Preferences.getAppToken()).invokeSync(request,
@@ -380,8 +424,8 @@ public class PMHelper {
 
 	}
 
-	public static StudentInfo getSharedStudentInfo(String id) throws ConnectionException, ProtocolException, SecurityException,
-			AACException {
+	public static StudentInfo getSharedStudentInfo(String id) throws ConnectionException, ProtocolException,
+			SecurityException, AACException {
 		MessageRequest request = new MessageRequest(Preferences.getHost(mContext), Preferences.getService()
 				+ "/eu.trentorise.smartcampus.portfolio.models.StudentInfo/portfolio/" + id);
 		request.setMethod(Method.GET);
@@ -391,8 +435,8 @@ public class PMHelper {
 		return Utils.convertJSONToObject(response.getBody(), StudentInfo.class);
 	}
 
-	public static ArrayList<StudentExams> getSharedStudentExams(String id) throws ConnectionException, ProtocolException,
-			SecurityException, AACException {
+	public static ArrayList<StudentExams> getSharedStudentExams(String id) throws ConnectionException,
+			ProtocolException, SecurityException, AACException {
 		MessageRequest request = new MessageRequest(Preferences.getHost(mContext), Preferences.getService()
 				+ "/eu.trentorise.smartcampus.portfolio.models.StudentExams/portfolio/" + id);
 		request.setMethod(Method.GET);
@@ -419,8 +463,8 @@ public class PMHelper {
 		return new ArrayList<UserProducedData>();
 	}
 
-	public static SharedPortfolioContainer getSharedPortfolioContainer(String id) throws ConnectionException, ProtocolException,
-			SecurityException, AACException {
+	public static SharedPortfolioContainer getSharedPortfolioContainer(String id) throws ConnectionException,
+			ProtocolException, SecurityException, AACException {
 		MessageRequest request = new MessageRequest(Preferences.getHost(mContext), Preferences.getService()
 				+ "/eu.trentorise.smartcampus.portfolio.models.SharedPortfolioContainer/" + id);
 		request.setMethod(Method.GET);
@@ -439,5 +483,73 @@ public class PMHelper {
 		intent.setAction(ctx.getString(eu.trentorise.smartcampus.android.common.R.string.share_intent_action));
 		intent.putExtra(ctx.getString(eu.trentorise.smartcampus.android.common.R.string.share_entity_arg_entity), obj);
 		AppHelper.startActivityForApp(intent, ctx);
+	}
+
+	private static SharedPreferences getPFBrowserPreferences(Context ctx) {
+		SharedPreferences out = ctx.getSharedPreferences(BROWSER_PREFS, Context.MODE_PRIVATE);
+		return out;
+	}
+
+	private static boolean isPFBrowserFirstLaunch(Context context) {
+		return getPFBrowserPreferences(context).getBoolean(FIRST_LAUNCH_PREFS, true);
+	}
+
+	private static void setFlagOpenPFinBrowser(Context context) {
+		Editor edit = getPFBrowserPreferences(context).edit();
+		edit.putBoolean(FIRST_LAUNCH_PREFS, false);
+		edit.commit();
+	}
+
+	private static void shoWarningDialog(final Context context) {
+		View checkBoxView = View.inflate(context, R.layout.open_pf_browser, null);
+		CheckBox checkBox = (CheckBox) checkBoxView.findViewById(R.id.checkbox);
+		checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+				write_preferences = isChecked;
+			}
+		});
+		checkBox.setText(context.getString(R.string.open_browser_checkbox));
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setTitle(context.getString(R.string.open_browser_title));
+		builder.setMessage(context.getString(R.string.open_browser_message)).setView(checkBoxView).setCancelable(false)
+				.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						if (write_preferences)
+							PMHelper.setFlagOpenPFinBrowser(context);
+						startPFBrowser(context);
+					}
+				}).setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						if (write_preferences)
+							PMHelper.setFlagOpenPFinBrowser(context);
+						dialog.cancel();
+					}
+				}).show();
+
+	}
+
+	public static void startPFBrowser(Context context) {
+		Intent browserIntent;
+		try {
+			browserIntent = new Intent(Intent.ACTION_VIEW,
+					Uri.parse("https://vas-dev.smartcampuslab.it/mycvs/mobile?token=" + PMHelper.getAuthToken()));
+			context.startActivity(browserIntent);
+
+		} catch (AACException e) {
+			// problems
+		}
+
+	}
+
+	public static void openPortfolioInBrowser(Context context) {
+		if (PMHelper.isPFBrowserFirstLaunch(context)) {
+			shoWarningDialog(context);
+		} else {
+			startPFBrowser(context);
+		}
 	}
 }

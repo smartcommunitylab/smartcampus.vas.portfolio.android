@@ -33,6 +33,11 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
+import com.github.espiandev.showcaseview.ActionBarTutorialHelper;
+import com.github.espiandev.showcaseview.ListViewTutorialHelper;
+import com.github.espiandev.showcaseview.TutorialHelper;
+import com.github.espiandev.showcaseview.TutorialHelper.TutorialProvider;
+import com.github.espiandev.showcaseview.TutorialItem;
 
 import eu.trentorise.smartcampus.ac.AACException;
 import eu.trentorise.smartcampus.ac.SCAccessProvider;
@@ -72,6 +77,7 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 	private boolean initialized = false;
 
 	private String userAuthToken;
+	private TutorialHelper mTutorialHelper = null;
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
@@ -122,12 +128,17 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 	}
 
 	private boolean initData(Bundle savedInstanceState) {
+		mTutorialHelper = new ActionBarTutorialHelper(this, mTutorialProvider);
+
 		try {
 			// Loading first fragment that works as home for application.
 			// Getting token
 			if (!isViewer() && (savedInstanceState == null || !savedInstanceState.getBoolean("initialized"))) {
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				Fragment frag = new PortfoliosListFragment();
+				Bundle args = new Bundle();
+				args.putParcelable(PortfoliosListFragment.TUTORIAL_HELPER, mTutorialHelper);
+				frag.setArguments(args);
 				ft.replace(R.id.fragment_container, frag).commitAllowingStateLoss();
 			} else if (savedInstanceState != null && savedInstanceState.containsKey("sharedPortfolio")) {
 				sharedPortfolioContainer = savedInstanceState.getParcelable("sharedPortfolio");
@@ -326,6 +337,7 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 		// PMHelper.endAppFailure(this,
 		// eu.trentorise.smartcampus.ac.R.string.token_required);
 		// }
+		mTutorialHelper.onTutorialActivityResult(requestCode, resultCode, data);
 
 		if (requestCode == SCAccessProvider.SC_AUTH_ACTIVITY_REQUEST_CODE) {
 			if (resultCode == RESULT_OK) {
@@ -414,68 +426,33 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 		super.onConfigurationChanged(newConfig);
 	}
 
-	// private class NotesTask extends AsyncTask<Void, String, Integer> {
-	//
-	// private static final int OK = 0, NO_CONNECTION = 1, SERVER_UNREACHABLE =
-	// 2;
-	//
-	// private boolean mStoreNotes;
-	//
-	// public NotesTask(boolean storeNotes) {
-	// mStoreNotes = storeNotes;
-	// }
-	//
-	// @Override
-	// protected void onPreExecute() {
-	// super.onPreExecute();
-	// // Showing progress bar
-	// showProgressBar(true);
-	// }
-	//
-	// @Override
-	// protected void onProgressUpdate(String... values) {
-	// // Setting text
-	// mNotesEditText.setText(values[0]);
-	// // Moving cursor to last position
-	// Selection.setSelection(mNotesEditText.getText(),
-	// mNotesEditText.length());
-	// }
-	//
-	// @Override
-	// protected Integer doInBackground(Void... params) {
-	// // Preparing app configurations
-	// // Checking if we have to store or load notes
-	// if (mStoreNotes) {
-	// // Storing user notes
-	// PMHelper.setNotes(mNotesEditText.getText().toString());
-	// } else {
-	// publishProgress(PMHelper.getNotes());
-	// }
-	// return OK;
-	// }
-	//
-	// @Override
-	// protected void onPostExecute(Integer result) {
-	// super.onPostExecute(result);
-	// // Hiding progress bar
-	// showProgressBar(false);
-	// // Checking result
-	// switch (result) {
-	// case NO_CONNECTION:
-	// // Here you can ask to activate connection
-	// break;
-	// case SERVER_UNREACHABLE:
-	// // Here you can advise user that the server is unreachable
-	// break;
-	// default:
-	// break;
-	// }
-	// }
-	//
-	// private void showProgressBar(boolean show) {
-	// setSupportProgressBarIndeterminateVisibility(show);
-	// }
-	//
-	// }
+private TutorialProvider mTutorialProvider = new TutorialProvider() {
+		int[] tutorialId= new int[]{R.id.modify_portfolio,R.id.create_portfolio};
+		TutorialItem[] tutorial = new TutorialItem[]{
+				new TutorialItem("modify", null, 0, R.string.tut_title_modify, R.string.tut_text_modify),
+				new TutorialItem("create", null, 0, R.string.tut_title_create, R.string.tut_text_create),
+
+}; 
+
+		
+		@Override
+		public void onTutorialFinished() {
+		}
+		
+		@Override
+		public void onTutorialCancelled() {
+		}
+		
+		@Override
+		public TutorialItem getItemAt(int i) {
+			ActionBarTutorialHelper.fillTutorialItemParams(tutorial[i], i, HomeActivity.this, tutorialId[i]);
+			return tutorial[i];
+		}
+		
+		@Override
+		public int size() {
+			return tutorial.length;
+		}
+	};
 
 }
