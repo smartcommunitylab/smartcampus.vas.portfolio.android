@@ -185,9 +185,13 @@ public class PortfoliosListFragment extends SherlockListFragment implements Tagg
 				public void handleResult(List<Portfolio> result) {
 					if (result != null) {
 						//clear data e find if there is the same portfolio
-						mPortfolios = result;
-						
-					}
+//						mPortfolios = result;
+//						mFragmentLoader.load(PortfoliosListFragment.class, false, null);
+						mPortfolios.clear();
+						// Adding new data
+						mPortfolios.addAll(result);
+						// Notifying adapter about new elements
+						mArrayAdapter.notifyDataSetChanged();					}
 
 				}
 			});
