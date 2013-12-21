@@ -123,32 +123,12 @@ public class PortfoliosListFragment extends SherlockListFragment implements Tagg
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		 inflater.inflate(R.menu.fragmentlist_menu, menu);
-//		menu.add(Menu.NONE, R.id.modify_portfolio, Menu.NONE, R.string.edit).setIcon(R.drawable.ic_edit)
-//				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-//		menu.add(Menu.NONE, R.id.create_portfolio, Menu.NONE, R.string.new_portfolio).setIcon(R.drawable.ic_add)
-//				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-//		menu.add(Menu.NONE, R.id.tutorial_portfolio, Menu.NONE, R.string.tutorial_portfolio)
-//				.setIcon(R.drawable.ic_tutorial).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.create_portfolio:
-			// Un comment if you want to use a fragment instead of an Activity
-			//
-			// // Searching old dialog instance
-			// FragmentTransaction ft =
-			// getActivity().getSupportFragmentManager().beginTransaction();
-			// Fragment prev =
-			// getActivity().getSupportFragmentManager().findFragmentByTag(TAG_DIALOG_PORTFOLIO_CREATE);
-			// if (prev != null) {
-			// ft.remove(prev);
-			// }
-			// ft.addToBackStack(null);
-			// // Creating and showing dialog.
-			// DialogFragment newFragment = new CreatePortfolioFragment();
-			// newFragment.show(ft, TAG_DIALOG_PORTFOLIO_CREATE);
 			Intent intent = new Intent(getActivity(), CreatePortfolioDialog.class);
 			startActivity(intent);
 			return true;
@@ -185,8 +165,6 @@ public class PortfoliosListFragment extends SherlockListFragment implements Tagg
 				public void handleResult(List<Portfolio> result) {
 					if (result != null) {
 						//clear data e find if there is the same portfolio
-//						mPortfolios = result;
-//						mFragmentLoader.load(PortfoliosListFragment.class, false, null);
 						mPortfolios.clear();
 						// Adding new data
 						mPortfolios.addAll(result);

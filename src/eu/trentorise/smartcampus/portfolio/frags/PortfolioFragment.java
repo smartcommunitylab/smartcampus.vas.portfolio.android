@@ -53,7 +53,6 @@ import com.actionbarsherlock.app.SherlockListFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.SubMenu;
 
 import eu.trentorise.smartcampus.android.common.SCAsyncTask;
 import eu.trentorise.smartcampus.android.common.tagging.SemanticSuggestion;
@@ -75,7 +74,6 @@ import eu.trentorise.smartcampus.portfolio.scutils.PortfolioUtil.CategorizedData
 import eu.trentorise.smartcampus.portfolio.utils.AbstractAsyncTaskProcessor;
 import eu.trentorise.smartcampus.portfolio.utils.OptionItem;
 import eu.trentorise.smartcampus.portfolio.utils.ToastBuilder;
-import eu.trentorise.smartcampus.portfolio.utils.WelcomeDlgHelper;
 import eu.trentorise.smartcampus.protocolcarrier.exceptions.ConnectionException;
 import eu.trentorise.smartcampus.protocolcarrier.exceptions.ProtocolException;
 import eu.trentorise.smartcampus.protocolcarrier.exceptions.SecurityException;
@@ -278,22 +276,21 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 							{
 								//aggiorna il dato
 								mPortfolio = portfolio;
-								if (mPortfolio == null) {
-									// Starting new task for portfolio
-									// mPortfolioTask = new PortfolioAsyncTask();
-									// mPortfolioTask.execute();
-									mLoadTask = new LoadAsyncTask();
-									mLoadTask.execute(true);
-								} else {
-									// // Starting new task for tags
-									// mTagTask = new TagTask();
-									// mTagTask.execute();
-									// Starting new task for categories
-									// mCategoryTask = new CategoryAsyncTask();
-									// mCategoryTask.execute();
-									mLoadTask = new LoadAsyncTask();
-									mLoadTask.execute(false);
-								}
+								mPortfolioUtil = new PortfolioUtil(getActivity(), mPortfolio);
+
+								new LoadAsyncTask().execute();
+//								mFragmentLoader.load(PortfolioFragment.class, false, PortfolioFragment.prepareArguments(mPortfolio, false));
+//								   FragmentManager fragmentManager =getSherlockActivity().getSupportFragmentManager();
+//								    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//								    Fragment newFragment = new PortfolioFragment();
+//								    Bundle args = new Bundle();
+//								    args.putParcelable(PORTFOLIO, mPortfolio);
+//								    newFragment.setArguments(args);
+//								    FragmentTransaction transaction = fragmentManager.beginTransaction();
+//								    transaction.replace(R.id.fragment_container, newFragment);
+//								    transaction.addToBackStack(null);
+//								    transaction.commit();
+								
 								return;
 							}
 						}
@@ -417,10 +414,7 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 			// Loading next fragment
 			mFragmentLoader.load(PersonalInfoFragment.class, true, args);
 			break;
-		// case 1:
-		// args = CherryFragment.prepareArguments(mPortfolio);
-		// // Loading next fragment
-		// mFragmentLoader.load(CherryFragment.class, true, args);
+
 		// break;
 		default:
 			// Retrieving element
@@ -467,32 +461,19 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 		// Checking if we are in shared or owned mode
 		if (mPortfolio == null) {
 			// Starting new task for portfolio
-			// mPortfolioTask = new PortfolioAsyncTask();
-			// mPortfolioTask.execute();
+
 			mLoadTask = new LoadAsyncTask();
 			mLoadTask.execute(true);
 		} else {
 			// // Starting new task for tags
-			// mTagTask = new TagTask();
-			// mTagTask.execute();
-			// Starting new task for categories
-			// mCategoryTask = new CategoryAsyncTask();
-			// mCategoryTask.execute();
+
 			mLoadTask = new LoadAsyncTask();
 			mLoadTask.execute(false);
 		}
 	}
 
 	private void cancelAnyActiveTask() {
-		// if (mTagTask != null && !mTagTask.isCancelled()) {
-		// mTagTask.cancel(true);
-		// }
-		// if (mCategoryTask != null && !mCategoryTask.isCancelled()) {
-		// mCategoryTask.cancel(true);
-		// }
-		// if (mPortfolioTask != null && !mPortfolioTask.isCancelled()) {
-		// mPortfolioTask.cancel(true);
-		// }
+
 		if (mLoadTask != null && !mLoadTask.isCancelled()) {
 			mLoadTask.cancel(true);
 		}
@@ -513,24 +494,6 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 	}
 
 	private void prepareOptionItem() {
-//		// Clearing items
-//		mOptionItems.clear();
-//		// Preparing option items
-//		mOptionItems.add(new OptionItem(MODIFY_PORTFOLIO, R.drawable.ic_edit, R.string.edit, OptionItem.VISIBLE));
-
-//		if (!mEditEnabled) {
-//			mOptionItems.add(new OptionItem(EDIT_PORTFOLIO, R.drawable.ic_filter, R.string.edit_portfolio,
-//					OptionItem.VISIBLE));
-//		}
-//		mOptionItems.add(new OptionItem(TRASH_PORTFOLIO, R.drawable.ic_trash, R.string.trash_portfolio,
-//				OptionItem.INVISIBLE));
-//		mOptionItems.add(new OptionItem(EXPORT_PORTFOLIO, R.drawable.ic_export, R.string.export_portfolio,
-//				OptionItem.INVISIBLE));
-//		mOptionItems.add(new OptionItem(SHARE_PORTFOLIO, R.drawable.ic_share, R.string.share_portfolio,
-//				OptionItem.INVISIBLE));
-//		mOptionItems
-//				.add(new OptionItem(TAG_PORTFOLIO, R.drawable.ic_tag, R.string.tag_portfolio, OptionItem.INVISIBLE));
-
 		// Refreshing options menu
 		getSherlockActivity().invalidateOptionsMenu();
 	}
@@ -540,26 +503,7 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 		mAdapter = new CategoryArrayAdapter(mCategories);
 	}
 
-	// private class PortfolioAsyncTask extends SCAsyncTask<Void, Void,
-	// Portfolio> {
-	//
-	// public PortfolioAsyncTask() {
-	// super(getSherlockActivity(), new AbstractAsyncTaskProcessor<Void,
-	// Portfolio>(getSherlockActivity()) {
-	// @Override
-	// public Portfolio performAction(Void... params) throws SecurityException,
-	// Exception {
-	// return PMHelper.getPortfolio(mSharedPortfolio.getPortfolioEntityId());
-	// }
-	//
-	// @Override
-	// public void handleResult(Portfolio result) {
-	// prepareView(result);
-	// }
-	// });
-	// }
-	// }
-	//
+
 	/*
 	 * private class PortfolioTask extends AsyncTask<Void, Void, Portfolio> {
 	 * 
