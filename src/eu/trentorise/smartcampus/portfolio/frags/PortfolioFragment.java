@@ -395,10 +395,7 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 			// Loading next fragment
 			mFragmentLoader.load(PersonalInfoFragment.class, true, args);
 			break;
-		// case 1:
-		// args = CherryFragment.prepareArguments(mPortfolio);
-		// // Loading next fragment
-		// mFragmentLoader.load(CherryFragment.class, true, args);
+
 		// break;
 		default:
 			// Retrieving element
@@ -472,24 +469,6 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 	}
 
 	private void prepareOptionItem() {
-//		// Clearing items
-//		mOptionItems.clear();
-//		// Preparing option items
-//		mOptionItems.add(new OptionItem(MODIFY_PORTFOLIO, R.drawable.ic_edit, R.string.edit, OptionItem.VISIBLE));
-
-//		if (!mEditEnabled) {
-//			mOptionItems.add(new OptionItem(EDIT_PORTFOLIO, R.drawable.ic_filter, R.string.edit_portfolio,
-//					OptionItem.VISIBLE));
-//		}
-//		mOptionItems.add(new OptionItem(TRASH_PORTFOLIO, R.drawable.ic_trash, R.string.trash_portfolio,
-//				OptionItem.INVISIBLE));
-//		mOptionItems.add(new OptionItem(EXPORT_PORTFOLIO, R.drawable.ic_export, R.string.export_portfolio,
-//				OptionItem.INVISIBLE));
-//		mOptionItems.add(new OptionItem(SHARE_PORTFOLIO, R.drawable.ic_share, R.string.share_portfolio,
-//				OptionItem.INVISIBLE));
-//		mOptionItems
-//				.add(new OptionItem(TAG_PORTFOLIO, R.drawable.ic_tag, R.string.tag_portfolio, OptionItem.INVISIBLE));
-
 	}
 
 	private void prepareAdapter() {
@@ -497,26 +476,7 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 		mAdapter = new CategoryArrayAdapter(mCategories);
 	}
 
-	// private class PortfolioAsyncTask extends SCAsyncTask<Void, Void,
-	// Portfolio> {
-	//
-	// public PortfolioAsyncTask() {
-	// super(getSherlockActivity(), new AbstractAsyncTaskProcessor<Void,
-	// Portfolio>(getSherlockActivity()) {
-	// @Override
-	// public Portfolio performAction(Void... params) throws SecurityException,
-	// Exception {
-	// return PMHelper.getPortfolio(mSharedPortfolio.getPortfolioEntityId());
-	// }
-	//
-	// @Override
-	// public void handleResult(Portfolio result) {
-	// prepareView(result);
-	// }
-	// });
-	// }
-	// }
-	//
+
 	/*
 	 * private class PortfolioTask extends AsyncTask<Void, Void, Portfolio> {
 	 * 
