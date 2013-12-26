@@ -33,11 +33,6 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
-import com.github.espiandev.showcaseview.ActionBarTutorialHelper;
-import com.github.espiandev.showcaseview.ListViewTutorialHelper;
-import com.github.espiandev.showcaseview.TutorialHelper;
-import com.github.espiandev.showcaseview.TutorialHelper.TutorialProvider;
-import com.github.espiandev.showcaseview.TutorialItem;
 
 import eu.trentorise.smartcampus.ac.AACException;
 import eu.trentorise.smartcampus.ac.SCAccessProvider;
@@ -75,9 +70,6 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 
 	private SharedPortfolioContainer sharedPortfolioContainer;
 	private boolean initialized = false;
-
-	private String userAuthToken;
-	private TutorialHelper mTutorialHelper = null;
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
@@ -128,7 +120,6 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 	}
 
 	private boolean initData(Bundle savedInstanceState) {
-		mTutorialHelper = new ActionBarTutorialHelper(this, mTutorialProvider);
 
 		try {
 			// Loading first fragment that works as home for application.
@@ -136,9 +127,6 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 			if (!isViewer() && (savedInstanceState == null || !savedInstanceState.getBoolean("initialized"))) {
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				Fragment frag = new PortfoliosListFragment();
-				Bundle args = new Bundle();
-				args.putParcelable(PortfoliosListFragment.TUTORIAL_HELPER, mTutorialHelper);
-				frag.setArguments(args);
 				ft.replace(R.id.fragment_container, frag).commitAllowingStateLoss();
 			} else if (savedInstanceState != null && savedInstanceState.containsKey("sharedPortfolio")) {
 				sharedPortfolioContainer = savedInstanceState.getParcelable("sharedPortfolio");
@@ -337,7 +325,6 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 		// PMHelper.endAppFailure(this,
 		// eu.trentorise.smartcampus.ac.R.string.token_required);
 		// }
-		mTutorialHelper.onTutorialActivityResult(requestCode, resultCode, data);
 
 		if (requestCode == SCAccessProvider.SC_AUTH_ACTIVITY_REQUEST_CODE) {
 			if (resultCode == RESULT_OK) {
@@ -425,34 +412,5 @@ public class HomeActivity extends SherlockFragmentActivity implements FragmentLo
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 	}
-
-private TutorialProvider mTutorialProvider = new TutorialProvider() {
-		int[] tutorialId= new int[]{R.id.modify_portfolio,R.id.create_portfolio};
-		TutorialItem[] tutorial = new TutorialItem[]{
-				new TutorialItem("modify", null, 0, R.string.tut_title_modify, R.string.tut_text_modify),
-				new TutorialItem("create", null, 0, R.string.tut_title_create, R.string.tut_text_create),
-
-}; 
-
-		
-		@Override
-		public void onTutorialFinished() {
-		}
-		
-		@Override
-		public void onTutorialCancelled() {
-		}
-		
-		@Override
-		public TutorialItem getItemAt(int i) {
-			ActionBarTutorialHelper.fillTutorialItemParams(tutorial[i], i, HomeActivity.this, tutorialId[i]);
-			return tutorial[i];
-		}
-		
-		@Override
-		public int size() {
-			return tutorial.length;
-		}
-	};
 
 }

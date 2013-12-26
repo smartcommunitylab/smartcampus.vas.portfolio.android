@@ -74,7 +74,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.github.espiandev.showcaseview.TutorialActivity"
+            android:name="com.github.espiandev.showcaseview.TourActivity"
             android:configChanges="orientation|screenSize|keyboardHidden|keyboard"
             android:theme="@style/TutorialTheme" >
             <intent-filter>

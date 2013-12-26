@@ -15,12 +15,12 @@
  ******************************************************************************/
 package eu.trentorise.smartcampus.common;
 
-import eu.trentorise.smartcampus.android.common.GlobalConfig;
-import eu.trentorise.smartcampus.protocolcarrier.exceptions.ProtocolException;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager.NameNotFoundException;
+import eu.trentorise.smartcampus.android.common.GlobalConfig;
+import eu.trentorise.smartcampus.protocolcarrier.exceptions.ProtocolException;
 
 /**
  * Utility class that allows Smart Campus applications to have a common cloud
@@ -36,7 +36,10 @@ public final class Preferences {
 	
 	// Service
 	private static final String SERVICE = "/portfolio/rest/";
-	
+
+	// Web
+	public static final String WEB = "/portfolio/mobile";
+
 	// Shared package path
 	private static final String SHARED_PACKAGE = "eu.trentorise.smartcampus.launcher";
 	
@@ -77,6 +80,9 @@ public final class Preferences {
 		return SERVICE;
 	}
 	
+	public static String getWebAddress(Context ctx) throws ProtocolException {
+		return  getHost(ctx)+WEB;
+	}
 	// ======================================================================= //
 	// OTHERS
 	// ======================================================================= //

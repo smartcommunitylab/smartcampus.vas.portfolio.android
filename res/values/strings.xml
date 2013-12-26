@@ -31,7 +31,7 @@
     <string name="role_in_prj">Role in the project</string>
     <string name="create">Create</string>
     <string name="refresh_portfolio">Refresh</string>
-    <string name="trash_portfolio">Trash</string>
+    <string name="trash_portfolio">Delete</string>
     <string name="export_portfolio">Export</string>
     <string name="share_portfolio">Share</string>
     <string name="tag_portfolio">Tag</string>
@@ -113,7 +113,7 @@
     <string name="app_failure_security">Failed to retrieve authentication data</string>
     <string name="app_failure_setup">Failed to initialize application</string>
     <string name="app_failure_operation">OOPS! An error occurred. Please check your connection or try again later</string>
-    <string name="welcome_msg">Hello! Welcome to the MyCVs for Android. This app will allow you to check your CVs and take some notes about them.</string>
+    <string name="welcome_msg">Hello! Welcome to the MyCVs for Android. This app will allow you to manage your CVs and take some notes about them.</string>
     <string name="welcome_msg2">You will automagically find your notes on the MyCVs web application (https://vas.smartcampuslab.it/mycvs), from which you will be able to edit and customize your CVs.</string>
     <string name="welcome_msg_showagain">Don\'t show this again</string>
     <string name="notes_hint">Add here any notes about your CVs: you will find them again on the MyCVs web page.</string>
@@ -125,7 +125,6 @@
     <string name="tut_title_modify">Modify</string>
     <string name="tut_text_modify">Modify your personal information </string>
     <string name="tut_title_create">Create</string>
-    <string name="tut_text_create">Create a new CV from your personal data, tap on one of your CVs to choose which info to show in it, export it, share it and so forth.
-        </string>
-
+    <string name="tut_text_create">Create a new CV from your personal data, tap on one of your CVs to choose which info to show in it, export it, share it and so forth.</string>
+    
 </resources>

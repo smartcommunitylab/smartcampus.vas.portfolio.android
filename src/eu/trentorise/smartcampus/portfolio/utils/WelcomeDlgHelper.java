@@ -15,33 +15,31 @@
  ******************************************************************************/
 package eu.trentorise.smartcampus.portfolio.utils;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.CheckBox;
-import eu.trentorise.smartcampus.portfolio.R;
 
 public class WelcomeDlgHelper {
 
-	public static void welcome(final Context ctx) {
-		boolean shown = ctx.getSharedPreferences("_welcome_dialog_shown", Context.MODE_PRIVATE).getBoolean("shown", false);
-		if (shown) return;
-		
-		LayoutInflater inflatter = (LayoutInflater)ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-		View view = inflatter.inflate(R.layout.welcomedialog, null);
-		builder.setView(view);
-		final AlertDialog dialog = builder.create();
-		CheckBox cb = (CheckBox) view.findViewById(R.id.welcomeCheckbox);
-		cb.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				ctx.getSharedPreferences("_welcome_dialog_shown", Context.MODE_PRIVATE).edit().putBoolean("shown", true).commit();
-				dialog.dismiss();
-			}
-		});
-		dialog.show();
+	public static boolean isWelcomeShown(final Context ctx) {
+		return ctx.getSharedPreferences("_welcome_dialog_shown", Context.MODE_PRIVATE).getBoolean("shown", false);
+//		LayoutInflater inflatter = (LayoutInflater)ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+//		View view = inflatter.inflate(R.layout.welcomedialog, null);
+//		builder.setView(view);
+//		final AlertDialog dialog = builder.create();
+//		CheckBox cb = (CheckBox) view.findViewById(R.id.welcomeCheckbox);
+//		cb.setOnClickListener(new View.OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				ctx.getSharedPreferences("_welcome_dialog_shown", Context.MODE_PRIVATE).edit().putBoolean("shown", true).commit();
+//				dialog.dismiss();
+//			}
+//		});
+//		dialog.show();
 
 	}
+	
+	public static void setWelcomeShown(final Context ctx) {
+		ctx.getSharedPreferences("_welcome_dialog_shown", Context.MODE_PRIVATE).edit().putBoolean("shown", true).commit();
+	}
+	
 }

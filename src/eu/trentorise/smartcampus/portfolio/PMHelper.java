@@ -34,8 +34,8 @@ import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.Toast;
 import eu.trentorise.smartcampus.ac.AACException;
 import eu.trentorise.smartcampus.ac.SCAccessProvider;
 import eu.trentorise.smartcampus.android.common.AppHelper;
@@ -81,7 +81,7 @@ public class PMHelper {
 	// cached notes
 	private UserData userData = null;
 	// cached portfolios
-	private static List<Portfolio> portfolioList = null;
+	private List<Portfolio> portfolioList = null;
 	// cached student info
 	private StudentInfo studentInfo = null;
 	private Boolean hasStudentInfo = null;
@@ -149,8 +149,8 @@ public class PMHelper {
 		activity.finish();
 	}
 
-	public static void showFailure(Activity activity, int id) {
-		Toast.makeText(activity, activity.getResources().getString(id), Toast.LENGTH_LONG).show();
+	public static void showFailure(Context ctx, int id) {
+		Toast.makeText(ctx, ctx.getResources().getString(id), Toast.LENGTH_LONG).show();
 	}
 
 	public static void setNotes(String string) throws DataException, NameNotFoundException, ConnectionException,
@@ -327,18 +327,12 @@ public class PMHelper {
 		return false;
 	}
 
-	private static void removeLocalPortfolio(String id) {
-		try {
-			for (Portfolio p:getInstance().portfolioList)
-			{
-				if (p.getId().equals(id))
-					getInstance().portfolioList.remove(p);
+	private static void removeLocalPortfolio(String id) throws DataException {
+		for (Portfolio p : getInstance().portfolioList) {
+			if (p.getId().equals(id)) {
+				getInstance().portfolioList.remove(p);
 			}
-		} catch (DataException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-		
 	}
 
 	public static Portfolio getPortfolio(String portfolioEntityId) throws NameNotFoundException, DataException,
@@ -369,8 +363,14 @@ public class PMHelper {
 		return p;
 	}
 
-	public static void removeAllPortfolios(){
-		portfolioList = null;
+	public static void resetData() throws DataException{
+		getInstance().portfolioList = null;
+		getInstance().hasStudentExams = null;
+		getInstance().hasStudentInfo = null;
+		getInstance().studentExams = null;
+		getInstance().studentInfo = null;
+		getInstance().userData = null;
+		getInstance().userProducedData = null;
 	}
 	public static Boolean isOwnPortfolio(String portfolioEntityId) throws NameNotFoundException, DataException,
 			ConnectionException, ProtocolException, SecurityException, AACException {
@@ -536,11 +536,11 @@ public class PMHelper {
 		Intent browserIntent;
 		try {
 			browserIntent = new Intent(Intent.ACTION_VIEW,
-					Uri.parse("https://vas-dev.smartcampuslab.it/mycvs/mobile?token=" + PMHelper.getAuthToken()));
+					Uri.parse(Preferences.getWebAddress(mContext)+"?token=" + getAuthToken()));
 			context.startActivity(browserIntent);
 
-		} catch (AACException e) {
-			// problems
+		} catch (Exception e) {
+			showFailure(context, R.string.app_failure_operation);
 		}
 
 	}

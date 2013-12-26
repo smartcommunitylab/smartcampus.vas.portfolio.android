@@ -51,6 +51,8 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.github.espiandev.showcaseview.TutorialHelper;
+import com.github.espiandev.showcaseview.TutorialHelper.TutorialProvider;
+import com.github.espiandev.showcaseview.TutorialItem;
 
 import eu.trentorise.smartcampus.android.common.SCAsyncTask;
 import eu.trentorise.smartcampus.android.common.tagging.SemanticSuggestion;
@@ -81,9 +83,6 @@ public class PortfoliosListFragment extends SherlockListFragment implements Tagg
 	// private static final String TAG_DIALOG_PORTFOLIO_CREATE =
 	// "dialog-portfolio-create";
 
-	private static final int CREATE_NEW_PORTFOLIO = 13;
-	private static final int MODIFY_PORTFOLIO = 16;
-	private static final int TUTORIAL_PORTFOLIO = 12;
 	public static final String TUTORIAL_HELPER = "tutorial helper";
 
 	private  List<Portfolio> mPortfolios = new ArrayList<Portfolio>();
@@ -92,8 +91,6 @@ public class PortfoliosListFragment extends SherlockListFragment implements Tagg
 	private PorfolioAdapter mArrayAdapter;
 
 	private PortfolioListAsyncTask mPortfolioAsyncTask;
-	private TutorialHelper mTutorialHelper = null;
-
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
@@ -117,7 +114,6 @@ public class PortfoliosListFragment extends SherlockListFragment implements Tagg
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
-		mTutorialHelper = getArguments().getParcelable(TUTORIAL_HELPER);
 	}
 
 	@Override
@@ -156,8 +152,8 @@ public class PortfoliosListFragment extends SherlockListFragment implements Tagg
 			PMHelper.openPortfolioInBrowser(getSherlockActivity());
 			return true;
 		case R.id.tutorial_portfolio:
-			if (mTutorialHelper != null)
-				mTutorialHelper.showTutorials();
+			TutorialHelper mTutorialHelper = new TutorialHelper(getActivity(), mTutorialProvider);
+			mTutorialHelper.showTutorials();
 			return true;
 		case R.id.refresh_portfolios:
 			refreshPortfolios();
@@ -168,30 +164,8 @@ public class PortfoliosListFragment extends SherlockListFragment implements Tagg
 	}
 
 	private void refreshPortfolios() {
-		new PortfolioRefreshAsyncTask().execute();
+		new PortfolioListAsyncTask().execute(true);
 		
-	}
-	private class PortfolioRefreshAsyncTask extends SCAsyncTask<Void, Void, List<Portfolio>> {
-
-		public PortfolioRefreshAsyncTask() {
-			super(getSherlockActivity(), new AbstractAsyncTaskProcessor<Void, List<Portfolio>>(getSherlockActivity()) {
-				@Override
-				public List<Portfolio> performAction(Void... params) throws SecurityException, Exception {
-					PMHelper.removeAllPortfolios();
-					return PMHelper.getPortfolioList();
-				}
-
-				@Override
-				public void handleResult(List<Portfolio> result) {
-					if (result != null) {
-						//clear data e find if there is the same portfolio
-						mPortfolios = result;
-						
-					}
-
-				}
-			});
-		}
 	}
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -233,12 +207,15 @@ public class PortfoliosListFragment extends SherlockListFragment implements Tagg
 		}
 	}
 
-	private class PortfolioListAsyncTask extends SCAsyncTask<Void, Void, List<Portfolio>> {
+	private class PortfolioListAsyncTask extends SCAsyncTask<Boolean, Void, List<Portfolio>> {
 
 		public PortfolioListAsyncTask() {
-			super(getSherlockActivity(), new AbstractAsyncTaskProcessor<Void, List<Portfolio>>(getSherlockActivity()) {
+			super(getSherlockActivity(), new AbstractAsyncTaskProcessor<Boolean, List<Portfolio>>(getSherlockActivity()) {
 				@Override
-				public List<Portfolio> performAction(Void... params) throws SecurityException, Exception {
+				public List<Portfolio> performAction(Boolean... params) throws SecurityException, Exception {
+					if (params != null && params.length > 0 && params[0] != null && params[0]) {
+						PMHelper.resetData();
+					}
 					return PMHelper.getPortfolioList();
 				}
 
@@ -253,7 +230,10 @@ public class PortfoliosListFragment extends SherlockListFragment implements Tagg
 						mArrayAdapter.notifyDataSetChanged();
 					}
 
-					WelcomeDlgHelper.welcome(getSherlockActivity());
+					if (!WelcomeDlgHelper.isWelcomeShown(getActivity())) {
+						new TutorialHelper(getActivity(), mTutorialProvider).showTourDialog(getString(R.string.welcome_msg), getString(com.github.espiandev.showcaseview.R.string.begin_tut));
+						WelcomeDlgHelper.setWelcomeShown(getActivity());
+					}
 				}
 			});
 		}
@@ -545,5 +525,38 @@ public class PortfoliosListFragment extends SherlockListFragment implements Tagg
 			});
 		}
 	}
+
+	private TutorialProvider mTutorialProvider = new TutorialProvider() {
+		int[] tutorialId = new int[]{R.id.modify_portfolio,R.id.create_portfolio};
+		TutorialItem[] tutorial = new TutorialItem[]{
+				new TutorialItem("modify", null, 0, R.string.tut_title_modify, R.string.tut_text_modify),
+				new TutorialItem("create", null, 0, R.string.tut_title_create, R.string.tut_text_create),
+		}; 
+
+		
+		@Override
+		public void onTutorialFinished() {
+		}
+		
+		@Override
+		public void onTutorialCancelled() {
+		}
+		
+		@Override
+		public TutorialItem getItemAt(int i) {
+			View v = getActivity().findViewById(tutorialId[i]);
+			if (v != null) {
+				tutorial[i].position = new int[2];
+				v.getLocationOnScreen(tutorial[i].position);
+				tutorial[i].width = v.getWidth();
+			}
+			return tutorial[i];
+		}
+		
+		@Override
+		public int size() {
+			return tutorial.length;
+		}
+	};
 
 }
