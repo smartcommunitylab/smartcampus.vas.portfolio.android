@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import android.app.Activity;
@@ -213,6 +214,8 @@ public class PMHelper {
 			HashSet<String> mCherryElements) throws NameNotFoundException, DataException, ConnectionException,
 			ProtocolException, SecurityException, AACException {
 		mPortfolio.showUserGeneratedData = PMUtils.updateList(mPortfolio.showUserGeneratedData, mUpdatedElements);
+		// CherryElements
+		mPortfolio.highlightUserGeneratedData = PMUtils.updateList(mPortfolio.highlightUserGeneratedData, mCherryElements);
 		getRemoteStorage().update(mPortfolio, false);
 	}
 
@@ -328,9 +331,10 @@ public class PMHelper {
 	}
 
 	private static void removeLocalPortfolio(String id) throws DataException {
-		for (Portfolio p : getInstance().portfolioList) {
+		for (Iterator<Portfolio> iterator = getInstance().portfolioList.iterator(); iterator.hasNext();) {
+			Portfolio p = iterator.next();
 			if (p.getId().equals(id)) {
-				getInstance().portfolioList.remove(p);
+				iterator.remove();
 			}
 		}
 	}
