@@ -30,13 +30,10 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
 
-import eu.trentorise.smartcampus.portfolio.R;
-import eu.trentorise.smartcampus.ac.SCAccessProvider;
 import eu.trentorise.smartcampus.android.common.SCAsyncTask;
+import eu.trentorise.smartcampus.android.common.validation.ValidatorHelper;
 import eu.trentorise.smartcampus.portfolio.models.Portfolio;
 import eu.trentorise.smartcampus.portfolio.utils.AbstractAsyncTaskProcessor;
-import eu.trentorise.smartcampus.portfolio.utils.ToastBuilder;
-import eu.trentorise.smartcampus.portfolio.utils.ViewAnimator;
 import eu.trentorise.smartcampus.protocolcarrier.exceptions.SecurityException;
 
 /**
@@ -70,8 +67,7 @@ public class CreatePortfolioDialog extends SherlockActivity {
 			@Override
 			public void onClick(View v) {
 				if(TextUtils.isEmpty(mPortfolioNameEditText.getText())){
-					ToastBuilder.showShort(CreatePortfolioDialog.this, R.string.fill_title_portfolio_field);					
-					ViewAnimator.animate(CreatePortfolioDialog.this, mPortfolioNameEditText, R.anim.shake);
+					ValidatorHelper.highlight(CreatePortfolioDialog.this, mPortfolioNameEditText, getString(R.string.fill_title_portfolio_field));
 					return;
 				}
 				
