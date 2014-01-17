@@ -1,0 +1,130 @@
+<resources>
+
+    <!-- App lables -->
+
+    <string name="app_name">MyCVs</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_home">My CVs</string>
+    <string name="app_uid_label">SmartCampus</string>
+    <string name="date_format">dd/MM/yy</string>
+
+    <!-- Labels -->
+
+    <string name="my_portfolios">My CVs</string>
+    <string name="portfolio">My CV</string>
+    <string name="projects">Progetti</string>
+    <string name="noticeboard">Avvisi</string>
+    <string name="title">Titolo</string>
+    <string name="media">Media</string>
+    <string name="subtitle">Sottotitolo</string>
+    <string name="tags">Tags</string>
+    <string name="date">Data</string>
+    <string name="study_program">Corso di studio</string>
+    <string name="course">Corso</string>
+    <string name="credit_points">CFU</string>
+    <string name="grade">Voto</string>
+    <string name="date">Data</string>
+    <string name="object">Oggetto</string>
+    <string name="description">Descrizione</string>
+    <string name="new_portfolio">Nuovo CV</string>
+    <string name="tutorial_portfolio">Tutorial</string>
+    <string name="role_in_prj">Ruolo nel progetto</string>
+    <string name="create">Crea</string>
+    <string name="refresh_portfolio">Aggiorna</string>
+    <string name="trash_portfolio">Elimina</string>
+    <string name="export_portfolio">Esporta</string>
+    <string name="share_portfolio">Condividi</string>
+    <string name="tag_portfolio">Tagga</string>
+    <string name="edit_portfolio">Modifica</string>
+    <string name="cancel">Annulla</string>
+    <string name="identity_info">Informazioni identità</string>
+    <string name="languages">Lingue</string>
+    <string name="skills">Competenze</string>
+    <string name="video_content">Contenuto video</string>
+    <string name="contacts">Contatti</string>
+    <string name="personal_info">Informazioni personali</string>
+    <string name="presentation">Presentazione</string>
+    <string name="overview">Panoramica</string>
+    <string name="study">Studio</string>
+    <string name="work">Lavoro</string>
+    <string name="unitn">Università di Trento</string>
+    <string name="comments">Commenti</string>
+    <string name="recommendations">Referenze</string>
+    <string name="please_commit_your_changes">Salva le tue modifiche prima di proseguire.</string>
+    <string name="more_about_me">Informazioni su di me</string>
+    <string name="no_other_info_contained">Non sono presenti altre informazioni</string>
+    <string name="insert_title_portfolio">Inserisci un titolo…</string>
+    <string name="name_surname">Nome e cognome:</string>
+    <string name="nation">Cittadinanza:</string>
+    <string name="cfu">CFU:</string>
+    <string name="marks_average">Media dei voti:</string>
+    <string name="gender">Sesso:</string>
+    <string name="date_of_birth">Data di nascita:</string>
+    <string name="academic_year">Anno accademico:</string>
+    <string name="enrollment_year">Anno di immatricolazione:</string>
+    <string name="phone">Telefono:</string>
+    <string name="mobile">Cellulare:</string>
+    <string name="address">Indirizzo:</string>
+    <string name="marks">Voti:</string>
+    <string name="study_course">Corso di studio:</string>
+
+    <!-- Messages for user -->
+    <string name="yes_continue">Continua</string>
+    <string name="done">Fatto</string>
+    <string name="login">Login</string>
+    <string name="cancel">Annulla</string>
+    <string name="save">Salva</string>
+    <string name="email">Email</string>
+    <string name="username">Username</string>
+    <string name="item_is_not_shown">Attenzione:\nQuesto elementi non viene visualizzato.</string>
+    <string name="pay_attention">Attenzione prego.</string>
+    <string name="be_careful">Attenzione!</string>
+    <string name="sure_to_continue_without_save">Sei sicuro di voler continuare senza salvare le modifiche?</string>
+    <string name="sure_to_show_these_data">Selezionando quest\'opzione, i tuoi voti saranno visibili ad altri utenti se scegli di condividere il tuo CV.</string>
+    <string name="add_notes">Åggiungi qui alcune note&#8230;</string>
+    <string name="no_connection_available">Connessione non disponibile.</string>
+    <string name="not_valid_name">Nome non valido.</string>
+    <string name="not_valid_credentials">Credenziali non valide.\nSi prega di verificarne il corretto inserimento.</string>
+    <string name="no_server_available">Il server è momentaneamente non disponibile. Si prega di riprovare più tardi.</string>
+    <string name="remember_access_data">Ricorda credenziali.</string>
+    <string name="password">Password</string>
+    <string name="cherry_on_the_cake">Ciliegina sulla torta</string>
+    <string name="not_valid_email">L\'indirizzo email non è valido.</string>
+    <string name="fill_email_field">Compila il campo Email.</string>
+    <string name="fill_username_field">Compila il campo Username.</string>
+    <string name="fill_title_portfolio_field">Compila il campo Titolo.</string>
+    <string name="fill_password_field">Compila il campo Password.</string>
+    <string name="fill_tags_field">Compila il campo Tags.</string>
+    <string name="tags_successfully_added">Tags aggiunte correttamente.</string>
+    <string name="tags_not_added">Si è verificato un errore. Si prega di riprovare più tardi.</string>
+    <string name="not_found_news">Nessuna notizia trovata.</string>
+    <string name="not_found_portfolios">Nessun CV presente.</string>
+    <string name="not_found_data">Nessun data trovato.</string>
+    <string name="tip_add_tags">Inserisci i tag separandoli con delle virgole.</string>
+    <string name="an_error_has_occured">Si è verificato un errore.</string>
+    <string name="cannot_find_portfolio">Non è stato possibile aprire il CV selezionato.</string>
+    <string name="portfolio_already_exist">Esiste già un CV con questo nome.</string>
+    <string name="sure_delete_portfolio">Sei sicuro di voler eliminare questo CV?</string>
+    <string name="problem_delete_portfolio">Si è verificato un errore nella cancellazione del CV.</string>
+
+    <!-- Portfolios -->
+    <string name="edit">Modifica</string>
+    <string name="filter">Filtra</string>
+    <string name="app_failure_security">Errore nell\'autenticazione</string>
+    <string name="app_failure_setup">Errore nell\'inizializzazone dell\'app.</string>
+    <string name="app_failure_operation">OOPS! Si è verificato un errore. Verifica la tua connessione o riprova più tardi.</string>
+    <string name="welcome_msg">Benvenuto su MyCVs per Android. Quest\'app ti consentirà di gestire ed annotare i tuoi curricula.</string>
+    <string name="welcome_msg2">Ritroverai le tue note sulla web application di MyCVs (https://vas.smartcampuslab.it/mycvs), da dove potrai modificare e personalizzare i tuoi curricula.</string>
+    <string name="welcome_msg_showagain">Non mostrare più</string>
+    <string name="notes_hint">Aggiungi qui le tue note riguardo ai tuoi curricula: le troverai di nuovo sulla pagina web di MyCVs.</string>
+    <string name="token_required">Eseguire il login prima di procedure con l\'applicazione.</string>
+    <string name="open_browser_title">Attenzione</string>
+    <string name="open_browser_message">Stai per lasciare l\'app ed essere trasferito al sito web di MyCVs. Sei d\'accordo?</string>
+    <string name="open_browser_checkbox">Non mostrare più</string>
+    <!-- Tutorial -->
+    <string name="tut_title_modify">Modifica</string>
+    <string name="tut_text_modify">Modifica le tue informazioni personali </string>
+    <string name="tut_title_create">Crea</string>
+    <string name="tut_text_create">Crea un nuovo CV a partire dai tuoi dati personali o seleziona uno dei CV per decidere quali informazioni mostrare in esso, esportarlo, condividerlo ecc.</string>
+    
+</resources>
