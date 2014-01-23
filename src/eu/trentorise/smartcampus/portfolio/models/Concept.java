@@ -42,6 +42,7 @@ public class Concept implements Parcelable {
 
 	public Concept(Parcel p) {
 		setId(p.readLong());
+		if (getId() == 0) id = null;
 		setName(p.readString());
 		setDescription(p.readString());
 		setSummary(p.readString());
@@ -132,7 +133,7 @@ public class Concept implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeLong(getId());
+		dest.writeLong(getId() == null ? 0 : getId());
 		dest.writeString(getName());
 		dest.writeString(getDescription());
 		dest.writeString(getSummary());
