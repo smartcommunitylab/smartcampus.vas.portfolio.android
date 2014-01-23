@@ -902,7 +902,7 @@ public class PortfolioFragment extends SherlockListFragment implements OnBackPre
 			if (getString(R.string.cherry_on_the_cake).equalsIgnoreCase(item.label)) {
 				// This hasn't any label so we have to use
 				// this trick
-				item.category = item.label;
+				item.category = Constants.CHERRY_ON_THE_CAKE;
 				// Checking mode
 				if (mEditEnabled) {
 					accept = !cherries.isEmpty();
