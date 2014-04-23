@@ -23,7 +23,6 @@
     <string name="course">Course</string>
     <string name="credit_points">CFU</string>
     <string name="grade">Grade</string>
-    <string name="date">Date</string>
     <string name="object">Object</string>
     <string name="description">Description</string>
     <string name="new_portfolio">New CV</string>
@@ -72,7 +71,6 @@
     <string name="yes_continue">Continue</string>
     <string name="done">Done</string>
     <string name="login">Login</string>
-    <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="email">Email</string>
     <string name="username">Username</string>
@@ -123,8 +121,7 @@
     <string name="open_browser_checkbox">Do not show me this message again</string>
     <!-- Tutorial -->
     <string name="tut_title_modify">Modify</string>
-    <string name="tut_text_modify">Modify your personal information </string>
+    <string name="tut_text_modify">Go to https://vas.smartcampuslab.it/portfolio/ to edit your profile</string>
     <string name="tut_title_create">Create</string>
-    <string name="tut_text_create">Create a new CV from your personal data, tap on one of your CVs to choose which info to show in it, export it, share it and so forth.</string>
-    
+    <string name="tut_text_create">Create a new CV from your personal information</string>    
 </resources>
