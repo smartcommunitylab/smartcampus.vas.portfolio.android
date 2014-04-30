@@ -16,6 +16,8 @@
 package eu.trentorise.smartcampus.portfolio;
 
 import android.accounts.AccountManager;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -157,38 +159,69 @@ public class HomeActivity extends SherlockFragmentActivity implements
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		setContentView(R.layout.activity_home);
 		if (LauncherHelper.isLauncherInstalled(this, true)) {
 			// Checking start action
 			if (isViewer()) {
 				mPortfolioEntityId = getIntent().getStringExtra(
 						getString(R.string.view_intent_arg_object_id));
 			}
+			if (PMHelper.isFirstLaunch(this)) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle(R.string.welcome_title)
+						.setMessage(R.string.welcome_msg3)
+						.setOnCancelListener(
+								new DialogInterface.OnCancelListener() {
 
-			initDataManagement(savedInstanceState);
+									@Override
+									public void onCancel(DialogInterface arg0) {
+										arg0.dismiss();
+										initialize(savedInstanceState);
+									}
+								})
+						.setPositiveButton(getString(R.string.ok),
+								new DialogInterface.OnClickListener() {
 
-			try {
-				if (!PMHelper.getAccessProvider().login(this, null)) {
-					initData(savedInstanceState);
-				}
-			} catch (AACException e) {
-				PMHelper.endAppFailure(this, R.string.app_failure_setup);
-				return;
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										dialog.dismiss();
+										initialize(savedInstanceState);
+									}
+								});
+				builder.create().show();
+				PMHelper.disableFirstLanch(this);
+			} else {
+
+				initialize(savedInstanceState);
 			}
-
-			setupContent();
-
-			initialized = true;
 		}
+	}
+
+	private void initialize(Bundle savedInstanceState) {
+		initDataManagement(savedInstanceState);
+		try {
+			if (!PMHelper.getAccessProvider().login(this, null)) {
+				initData(savedInstanceState);
+			}
+		} catch (AACException e) {
+			PMHelper.endAppFailure(this, R.string.app_failure_setup);
+			return;
+		}
+
+		setupContent();
+
+		initialized = true;
 	}
 
 	private void setupContent() {
 		// Asking for windows features
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		
 		// Setting content view
-		setContentView(R.layout.activity_home);
+		
 		// Getting UI references
 		mSlidingButton = (Button) findViewById(R.id.handle);
 		mNotesEditText = (EditText) findViewById(R.id.note_edittext);
@@ -247,7 +280,7 @@ public class HomeActivity extends SherlockFragmentActivity implements
 		// Cancelling any active task
 		cancelNotesTask();
 		// Closing sliding drawer
-		if(mSlidingDrawer!=null)
+		if (mSlidingDrawer != null)
 			mSlidingDrawer.close();
 	}
 

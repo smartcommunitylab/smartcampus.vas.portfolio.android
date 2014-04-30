@@ -121,7 +121,11 @@
     <string name="open_browser_title">Warning</string>
     <string name="open_browser_message">You are leaving the app and entering in the Portfolio\'s website. Do you agree?</string>
     <string name="open_browser_checkbox">Do not show me this message again</string>
+    
+    
     <!-- Tutorial -->
+    <string name="welcome_title">Welcome to MyCVs! </string>
+    <string name="welcome_msg3">This app lets you access your academic information in order to keep track of this information, share it with your Smart Campus friends, or start creating your own CV.</string>
     <string name="tut_title_modify">Modify</string>
     <string name="tut_text_modify">Modify your personal information </string>
     <string name="tut_title_create">Create</string>
