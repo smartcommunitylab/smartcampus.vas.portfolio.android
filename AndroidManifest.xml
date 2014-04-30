@@ -51,7 +51,7 @@
             android:value="true" />
 
         <activity
-            android:name=".HomeActivity"
+            android:name="eu.trentorise.smartcampus.portfolio.HomeActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_home"
             android:launchMode="singleTask" >
@@ -82,7 +82,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".CreatePortfolioDialog"
+            android:name="eu.trentorise.smartcampus.portfolio.CreatePortfolioDialog"
             android:configChanges="orientation|screenSize"
             android:label="@string/new_portfolio" />
 
