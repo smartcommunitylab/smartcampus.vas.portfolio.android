@@ -20,7 +20,7 @@ import android.text.util.Linkify;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import eu.trentorise.smartcampus.portfolio.R;
+import it.smartcampuslab.portfolio.R;
 import eu.trentorise.smartcampus.portfolio.models.UserProducedData;
 
 /**

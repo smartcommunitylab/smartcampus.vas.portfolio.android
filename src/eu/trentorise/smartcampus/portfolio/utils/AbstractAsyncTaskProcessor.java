@@ -21,7 +21,7 @@ import eu.trentorise.smartcampus.ac.SCAccessProvider;
 import eu.trentorise.smartcampus.android.common.HandleExceptionHelper;
 import eu.trentorise.smartcampus.android.common.SCAsyncTask.SCAsyncTaskProcessor;
 import eu.trentorise.smartcampus.portfolio.PMHelper;
-import eu.trentorise.smartcampus.portfolio.R;
+import it.smartcampuslab.portfolio.R;
 
 public abstract class AbstractAsyncTaskProcessor<Params, Result> implements SCAsyncTaskProcessor<Params, Result> {
 
@@ -52,7 +52,7 @@ public abstract class AbstractAsyncTaskProcessor<Params, Result> implements SCAs
 			accessProvider.login(activity, null);
 		} catch (Exception e) {
 			Log.e(getClass().getName(), "" + e.getMessage());
-			PMHelper.showFailure(activity, eu.trentorise.smartcampus.portfolio.R.string.app_failure_security);
+			PMHelper.showFailure(activity, R.string.app_failure_security);
 		}
 	}
 

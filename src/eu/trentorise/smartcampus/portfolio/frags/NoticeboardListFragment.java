@@ -23,7 +23,7 @@ import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.SherlockListFragment;
 
-import eu.trentorise.smartcampus.portfolio.R;
+import it.smartcampuslab.portfolio.R;
 import eu.trentorise.smartcampus.portfolio.interfaces.NoteLayerInteractor;
 import eu.trentorise.smartcampus.portfolio.interfaces.SharedPortfolio;
 

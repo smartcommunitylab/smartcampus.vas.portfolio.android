@@ -15,6 +15,8 @@
  ******************************************************************************/
 package eu.trentorise.smartcampus.portfolio;
 
+import it.smartcampuslab.portfolio.R;
+
 import java.util.List;
 
 import android.accounts.AccountManager;

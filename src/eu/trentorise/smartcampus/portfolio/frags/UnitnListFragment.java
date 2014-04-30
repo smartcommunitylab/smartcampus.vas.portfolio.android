@@ -31,7 +31,7 @@ import com.actionbarsherlock.app.SherlockListFragment;
 
 import eu.trentorise.smartcampus.android.common.SCAsyncTask;
 import eu.trentorise.smartcampus.portfolio.PMHelper;
-import eu.trentorise.smartcampus.portfolio.R;
+import it.smartcampuslab.portfolio.R;
 import eu.trentorise.smartcampus.portfolio.conf.AppConfigurations;
 import eu.trentorise.smartcampus.portfolio.interfaces.SharedPortfolio;
 import eu.trentorise.smartcampus.portfolio.models.ExamData;

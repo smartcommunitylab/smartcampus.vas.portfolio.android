@@ -15,6 +15,7 @@
  ******************************************************************************/
 package eu.trentorise.smartcampus.portfolio;
 
+import it.smartcampuslab.portfolio.R;
 import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.content.DialogInterface;

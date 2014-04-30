@@ -15,6 +15,8 @@
  ******************************************************************************/
 package eu.trentorise.smartcampus.portfolio;
 
+import it.smartcampuslab.portfolio.R;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

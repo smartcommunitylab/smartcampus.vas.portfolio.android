@@ -15,7 +15,7 @@
  ******************************************************************************/
 package eu.trentorise.smartcampus.portfolio.conf;
 
-import eu.trentorise.smartcampus.portfolio.R;
+import it.smartcampuslab.portfolio.R;
 import android.content.Context;
 
 /**

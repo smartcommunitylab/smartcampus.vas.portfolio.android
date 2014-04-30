@@ -25,7 +25,7 @@ import android.widget.Button;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
-import eu.trentorise.smartcampus.portfolio.R;
+import it.smartcampuslab.portfolio.R;
 import eu.trentorise.smartcampus.portfolio.interfaces.FragmentLoader;
 import eu.trentorise.smartcampus.portfolio.interfaces.NoteLayerInteractor;
 import eu.trentorise.smartcampus.portfolio.interfaces.SharedPortfolio;

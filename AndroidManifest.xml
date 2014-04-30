@@ -14,7 +14,7 @@
   limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="eu.trentorise.smartcampus.portfolio"
+    package="it.smartcampuslab.portfolio"
     android:installLocation="internalOnly"
     android:sharedUserId="eu.trentorise.smartcampus.shared"
     android:sharedUserLabel="@string/app_uid_label"

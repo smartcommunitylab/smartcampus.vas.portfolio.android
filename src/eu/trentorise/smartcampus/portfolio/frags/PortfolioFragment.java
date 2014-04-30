@@ -60,7 +60,7 @@ import eu.trentorise.smartcampus.android.common.tagging.SuggestionHelper;
 import eu.trentorise.smartcampus.android.common.tagging.TaggingDialog;
 import eu.trentorise.smartcampus.common.Preferences;
 import eu.trentorise.smartcampus.portfolio.PMHelper;
-import eu.trentorise.smartcampus.portfolio.R;
+import it.smartcampuslab.portfolio.R;
 import eu.trentorise.smartcampus.portfolio.interfaces.FragmentLoader;
 import eu.trentorise.smartcampus.portfolio.interfaces.NoteLayerInteractor;
 import eu.trentorise.smartcampus.portfolio.interfaces.OnBackPressedListener;

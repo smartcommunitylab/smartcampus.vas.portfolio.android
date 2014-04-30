@@ -33,7 +33,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
-import eu.trentorise.smartcampus.portfolio.R;
+import it.smartcampuslab.portfolio.R;
 import eu.trentorise.smartcampus.portfolio.interfaces.SharedPortfolio;
 import eu.trentorise.smartcampus.portfolio.models.UserProducedData;
 import eu.trentorise.smartcampus.portfolio.scutils.DetailedUPDataRender;
