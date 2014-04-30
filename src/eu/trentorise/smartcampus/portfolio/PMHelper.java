@@ -31,6 +31,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.CheckBox;
@@ -94,6 +95,7 @@ public class PMHelper {
 
 	public static final String ENTITY_TYPE_PORTFOLIO = "portfolio";
 	private static boolean write_preferences = false;
+	private static String APP_FIST_LAUNCH="pmfist_launch";
 
 	protected PMHelper(Context mContext) {
 		super();
@@ -555,5 +557,13 @@ public class PMHelper {
 		} else {
 			startPFBrowser(context);
 		}
+	}
+	
+	public static boolean isFirstLaunch(Context ctx){
+		return PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean(APP_FIST_LAUNCH, true);
+	}
+	
+	public static void disableFirstLanch(Context ctx){
+		PreferenceManager.getDefaultSharedPreferences(ctx).edit().putBoolean(APP_FIST_LAUNCH, false).commit();
 	}
 }

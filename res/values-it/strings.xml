@@ -119,7 +119,11 @@
     <string name="open_browser_title">Attenzione</string>
     <string name="open_browser_message">Stai per lasciare l\'app ed essere trasferito al sito web di MyCVs. Sei d\'accordo?</string>
     <string name="open_browser_checkbox">Non mostrare più</string>
+    
+    
     <!-- Tutorial -->
+    <string name="welcome_title">Benvenuto in MyCVs!</string>
+    <string name="welcome_msg3">Quest’app ti permetterà di accedere alle tue informazioni accademiche in modo da tenere traccia di queste informazioni, condividerle con i tuoi amici Smart Campus o cominciare a creare il tuo CV.</string>
     <string name="tut_title_modify">Modifica</string>
     <string name="tut_text_modify">Visita https://vas.smartcampuslab.it/portfolio/ per modificare il tuo profilo</string>
     <string name="tut_title_create">Crea</string>
