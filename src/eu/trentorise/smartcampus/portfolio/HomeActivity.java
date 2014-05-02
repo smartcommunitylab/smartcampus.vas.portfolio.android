@@ -172,8 +172,8 @@ public class HomeActivity extends SherlockFragmentActivity implements
 			}
 			if (PMHelper.isFirstLaunch(this)) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle(R.string.welcome_title)
-						.setMessage(R.string.welcome_msg3)
+				builder//.setTitle(R.string.welcome_title)
+						.setView(getLayoutInflater().inflate(R.layout.disclaimerdialog, null))
 						.setOnCancelListener(
 								new DialogInterface.OnCancelListener() {
 

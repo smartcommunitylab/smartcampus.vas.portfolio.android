@@ -210,7 +210,7 @@ public class PortfoliosListFragment extends SherlockListFragment implements Tagg
 					}
 
 					if (!WelcomeDlgHelper.isWelcomeShown(getActivity())) {
-						new TutorialHelper(getActivity(), mTutorialProvider).showTourDialog(getString(R.string.welcome_msg), getString(com.github.espiandev.showcaseview.R.string.begin_tut));
+						new TutorialHelper(getActivity(), mTutorialProvider).showTourDialog(getString(R.string.welcome_title), getString(R.string.welcome_msg3), getString(com.github.espiandev.showcaseview.R.string.begin_tut));
 						WelcomeDlgHelper.setWelcomeShown(getActivity());
 					}
 				}

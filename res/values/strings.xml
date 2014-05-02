@@ -127,5 +127,8 @@
     <string name="tut_title_modify">Modify</string>
     <string name="tut_text_modify">Go to https://vas.smartcampuslab.it/portfolio/ to edit your profile</string>
     <string name="tut_title_create">Create</string>
-    <string name="tut_text_create">Create a new CV from your personal information</string>    
+    <string name="tut_text_create">Create a new CV from your personal information</string>
+    
+    <!-- Disclaimer -->
+    <string name="disclaimer">This app uses some of the data from your University of Trento account. In order to fully use all of the functions of this app, you will  first have to give the University permission to release your data to Smart Campus. Please go to the following website, sign into your UniTn account, and fill out the form:\n\n https://webapps.unitn.it/Apply/it/Web/GoHome/smartcampus/smartc</string>
 </resources>
