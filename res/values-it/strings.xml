@@ -130,6 +130,6 @@
     <string name="tut_text_create">Crea un nuovo CV a partire dai tuoi dati personali</string>
     
     <!-- Disclaimer -->
-    <string name="disclaimer">Quest’app utilizza alcuni dati provenienti dal tuo account dell’Università di Trento. Per utilizzare appieno tutte le funzonalità di quest’app, devi consentire all’Università di Trento di rilasciare i tuoi dati a Smart Campus. Per favore visita il seguente sito web, accedi con il tuo account UniTn, e compila il form: https://webapps.unitn.it/Apply/it/Web/GoHome/smartcampus/smartc</string>
+    <string name="disclaimer">Quest’app utilizza alcuni dati provenienti dal tuo account dell’Università di Trento. Per utilizzare appieno tutte le funzonalità di quest’app, devi consentire all’Università di Trento di rilasciare i tuoi dati a Smart Campus. Per favore visita il seguente sito web, accedi con il tuo account UniTn, e compila il form:\n\n https://webapps.unitn.it/Apply/it/Web/GoHome/smartcampus/smartc</string>
     
 </resources>
