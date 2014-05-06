@@ -35,10 +35,12 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.TextView;
 import android.widget.Toast;
 import eu.trentorise.smartcampus.ac.AACException;
 import eu.trentorise.smartcampus.ac.SCAccessProvider;
@@ -493,9 +495,14 @@ public class PMHelper {
 	}
 	
 	private static void showShareDisclaimer(final Portfolio exp,final Activity ctx){
+		TextView msg = new TextView(ctx);
+		msg.setText(R.string.disclaimer_share);
+		msg.setPadding(6, 6, 6, 6);
+		msg.setGravity(Gravity.CENTER);
+		msg.setTextSize(18);
 		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
 		builder.setTitle(android.R.string.dialog_alert_title)
-			   .setMessage(R.string.disclaimer_share)
+			   .setView(msg)
 			   .setOnCancelListener(new DialogInterface.OnCancelListener() {
 				
 				@Override
