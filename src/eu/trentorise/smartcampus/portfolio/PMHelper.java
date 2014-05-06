@@ -98,6 +98,7 @@ public class PMHelper {
 	public static final String ENTITY_TYPE_PORTFOLIO = "portfolio";
 	private static boolean write_preferences = false;
 	private static String APP_FIST_LAUNCH="pmfist_launch";
+	private static String FIRST_SHARE="pm_first_share";
 
 	protected PMHelper(Context mContext) {
 		super();
@@ -481,8 +482,38 @@ public class PMHelper {
 
 		return Utils.convertJSONToObject(response.getBody(), SharedPortfolioContainer.class);
 	}
+	
+	public static void share(final Portfolio exp,final Activity ctx) {
+		if(PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean(FIRST_SHARE, true)){
+			showShareDisclaimer(exp, ctx);
+			PreferenceManager.getDefaultSharedPreferences(ctx).edit().putBoolean(FIRST_SHARE, false).commit();
+		}
+		else
+			callshare(exp, ctx);
+	}
+	
+	private static void showShareDisclaimer(final Portfolio exp,final Activity ctx){
+		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+		builder.setTitle(android.R.string.dialog_alert_title)
+			   .setMessage(R.string.disclaimer_share)
+			   .setOnCancelListener(new DialogInterface.OnCancelListener() {
+				
+				@Override
+				public void onCancel(DialogInterface dialog) {
+					callshare(exp, ctx);
+				}
+			   })
+			   .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						callshare(exp, ctx);
+					}
+			   });
+		builder.create().show();
+	}
 
-	public static void share(Portfolio exp, Activity ctx) {
+	private static void callshare(Portfolio exp, Activity ctx) {
 		Entity obj = new Entity();
 		obj.setEntityId(exp.entityId);
 		obj.setTitle(exp.name);
