@@ -35,8 +35,10 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
+import android.text.Html;
 import android.view.Gravity;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -495,13 +497,11 @@ public class PMHelper {
 	}
 	
 	private static void showShareDisclaimer(final Portfolio exp,final Activity ctx){
-		TextView msg = new TextView(ctx);
-		msg.setText(R.string.disclaimer_share);
-		msg.setPadding(16, 16, 16, 16);
-		msg.setTextSize(18);
+		WebView wv = new WebView(ctx);
+		wv.loadDataWithBaseURL("", ctx.getString(R.string.disclaimer_share),"text/html","utf-8","");
 		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
 		builder.setTitle("")
-			   .setView(msg)
+			   .setView(wv)
 			   .setOnCancelListener(new DialogInterface.OnCancelListener() {
 				
 				@Override
