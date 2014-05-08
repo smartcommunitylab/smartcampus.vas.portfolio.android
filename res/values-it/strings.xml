@@ -131,6 +131,6 @@
     
     
     <!-- Disclaimers -->
-    <string name="disclaimer">Quest’app utilizza alcuni dati provenienti dal tuo account dell’Università di Trento. Per utilizzare appieno tutte le funzonalità di quest’app, devi consentire all’Università di Trento di rilasciare i tuoi dati a Smart Campus. Per favore visita il seguente sito web, accedi con il tuo account UniTn, e compila il form:\n\n https://webapps.unitn.it/Apply/it/Web/GoHome/smartcampus/smartc</string>
+    <string name="disclaimer">Questa app utilizza alcuni dati provenienti dal tuo account UniTn. Per utilizzarne appieno le funzionalità, devi consentire all’Università di Trento di passare i tuoi dati a Smart Campus. Se non lo hai già fatto, per favore visita il seguente sito web, accedi con il tuo account UniTn e compila la scheda:\n\n https://webapps.unitn.it/Apply/it/Web/GoHome/smartcampus/smartc</string>
     <string name="disclaimer_share"><![CDATA[<div style=\'text-align:justify;font-family:Arial;font-size:20px;padding:8px\'>I CV condivisi sono visibili all’interno dell’app MyPeople.<br>Fai attenzione quando condividi un CV: altri utenti potrebbero vedere i voti della tua carriera.<br>Allo stesso modo, se spunti l’opzione "Pubblico", il CV sarà disponibile a chiunque nella comunità Smart Campus.</div>]]></string>
 </resources>
