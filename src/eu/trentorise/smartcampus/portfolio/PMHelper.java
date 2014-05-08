@@ -497,11 +497,10 @@ public class PMHelper {
 	private static void showShareDisclaimer(final Portfolio exp,final Activity ctx){
 		TextView msg = new TextView(ctx);
 		msg.setText(R.string.disclaimer_share);
-		msg.setPadding(6, 6, 6, 6);
-		msg.setGravity(Gravity.CENTER);
+		msg.setPadding(16, 16, 16, 16);
 		msg.setTextSize(18);
 		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-		builder.setTitle(android.R.string.dialog_alert_title)
+		builder.setTitle("")
 			   .setView(msg)
 			   .setOnCancelListener(new DialogInterface.OnCancelListener() {
 				
