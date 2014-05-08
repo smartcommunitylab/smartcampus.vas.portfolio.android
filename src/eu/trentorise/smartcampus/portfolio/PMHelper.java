@@ -498,7 +498,8 @@ public class PMHelper {
 	
 	private static void showShareDisclaimer(final Portfolio exp,final Activity ctx){
 		WebView wv = new WebView(ctx);
-		wv.loadDataWithBaseURL("", ctx.getString(R.string.disclaimer_share),"text/html","utf-8","");
+		//wv.loadDataWithBaseURL("",,"");
+		wv.loadData(ctx.getString(R.string.disclaimer_share),"text/html; charset=UTF-8","utf-8");
 		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
 		builder.setTitle("")
 			   .setView(wv)
