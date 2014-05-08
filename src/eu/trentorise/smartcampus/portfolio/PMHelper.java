@@ -498,10 +498,9 @@ public class PMHelper {
 	
 	private static void showShareDisclaimer(final Portfolio exp,final Activity ctx){
 		WebView wv = new WebView(ctx);
-		//wv.loadDataWithBaseURL("",,"");
 		wv.loadData(ctx.getString(R.string.disclaimer_share),"text/html; charset=UTF-8","utf-8");
 		AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-		builder.setTitle("")
+		builder.setTitle(android.R.string.dialog_alert_title)
 			   .setView(wv)
 			   .setOnCancelListener(new DialogInterface.OnCancelListener() {
 				
